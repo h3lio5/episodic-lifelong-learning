@@ -127,7 +127,7 @@ def save_trainloss():
     plt.xlabel("Batch")
     plt.ylabel("Loss")
     plt.plot(train_loss_set)
-    plt.savefig('./episodic-lifelong-learning/train_loss.png')
+    plt.savefig('./train_loss.png')
 
 
 if __name__ == '__main__':
@@ -139,7 +139,7 @@ if __name__ == '__main__':
         # save train_loss graph
         save_trainloss()
         # save model state
-        model.save_pretrained('/episodic-lifelong-learning/models/enc_dec.pth')
+        model.save_pretrained('./models/enc_dec.pth')
 
     if args.mode == 'test':
         test(model)

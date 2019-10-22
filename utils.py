@@ -42,7 +42,7 @@ preprocess = (lambda x: re.sub(r"https?:\/\/\S+\b|www\.(\w+\.)+\S*", "",str(x)))
 
 
 
-def create_ordered_tc_data(order,base_location='data/original_data',save_location='data/ordered_data',split='test'):
+def create_ordered_tc_data(order,base_location='../data/original_data',save_location='../data/ordered_data',split='train'):
     """
     creates ordered dataset for text classification with a maximum of 115,000 sequences
     and 7,600 sequences from each individual dataset for train and test data respectively
@@ -95,5 +95,3 @@ def create_ordered_tc_data(order,base_location='data/original_data',save_locatio
     ordered_dataframe.to_csv(save_location+'/'+split+'/'+str(order)+'.csv',index=False)
     with open(save_location+'/'+split+'/'+str(order)+'.pkl','wb') as f:
         pickle.dump(label_to_class,f)
-
-create_ordered_tc_data(4)
