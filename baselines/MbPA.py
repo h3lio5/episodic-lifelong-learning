@@ -5,7 +5,7 @@ import numpy as np
 import random
 
 
-class MbPA(nn.Module):
+class MbPA():
     """
     Implements Memory based Parameter Adaptation model
     """
@@ -30,7 +30,7 @@ class MbPA(nn.Module):
         """
         Bert classification model
         """
-        loss,logits = self.classify(content,attention_mask=attention_mask,labels=labels)
+        loss,logits = self.classifier(content,attention_mask=attention_mask,labels=labels)
         return loss,logits
 
     def infer(self,content_batch):
@@ -70,10 +70,10 @@ class MbPA(nn.Module):
             k_labels = torch.LongTensor(k_labels)
 
             if self.use_cuda:
-                new_model.cuda()
-                k_content.cuda()
-                k_attn_masks.cuda()
-                k_labels.cuda()
+                new_model = new_model.cuda()
+                k_content = k_content.cuda()
+                k_attn_masks = k_attn_masks.cuda()
+                k_labels = k_labels.cuda()
 
             optimizer = transformers.AdamW(new_model.parameters(),lr=1e-3)
             # Train the base model for L epochs to locally adapt the parameters : modify the
