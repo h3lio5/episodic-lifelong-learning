@@ -132,5 +132,3 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
     ordered_dataframe.to_csv(save_location+'/'+split+'/'+str(order)+'.csv',index=False)
     with open(save_location+'/'+split+'/'+str(order)+'.pkl','wb') as f:
         pickle.dump(label_to_class,f)
-for i in range(4):
-    create_ordered_tc_data(i+1,split='test')
