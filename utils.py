@@ -105,6 +105,7 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
 
         elif data == 'yahoo':
             df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',header=None,names=['labels','title','content','answer'])
+            df.dropna(subset=['content'],inplace=True)
             labels = df.labels[:max_samples] + num_classes
             content= df.content[:max_samples].apply(preprocess)
             ordered_dataset['labels'].extend(list(labels))
@@ -116,6 +117,7 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
             num_classes+=TC_NUM_CLASSES[data]
         else:
             df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',header=None,names=['labels','title','content'])
+            df.dropna(subset=['content'],inplace=True)
             labels = df.labels[:max_samples] + num_classes
             content= df.content[:max_samples].apply(preprocess)
             ordered_dataset['labels'].extend(list(labels))
@@ -131,4 +133,4 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
     with open(save_location+'/'+split+'/'+str(order)+'.pkl','wb') as f:
         pickle.dump(label_to_class,f)
 for i in range(4):
-    create_ordered_tc_data(i+1)
+    create_ordered_tc_data(i+1,split='test')
