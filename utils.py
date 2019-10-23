@@ -50,23 +50,58 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
     """
     dataset_sequence = TC_ORDER[order]
     ordered_dataset = {'labels':[],'content':[]}
-    num_classes = 0
+    num_classes = -1
     max_samples = 115000 if split=='train' else 7600
     label_to_class = dict()
+    amazon_done = False
+    amazon_labels = dict()
+    yelp_done = False
+    yelp_labels = dict()
 
     for data in dataset_sequence:
 
         if data == 'yelp':
+            yelp_done = True
             df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',header=None,names=['labels','content'])
-            labels = df.labels[:max_samples] + num_classes
-            content= df.content[:max_samples].apply(preprocess)
-            ordered_dataset['labels'].extend(list(labels))
+            df.dropna(subset=['content'],inplace=True)
+            content = df.content[:max_samples].apply(preprocess)
             ordered_dataset['content'].extend(list(content))
-            # Mapping new labels to classes
-            for k,v in INDIVIDUAL_CLASS_LABELS[data].items():
-                new_key = k + num_classes
-                label_to_class[new_key] = v
-            num_classes+=TC_NUM_CLASSES[data]
+            if amazon_done:
+                labels = df.labels[:max_samples].apply(lambda x : amazon_labels[x])
+                ordered_dataset['labels'].extend(list(labels))
+                for k,v in INDIVIDUAL_CLASS_LABELS[data].items():
+                    new_key = amazon_labels[k]
+                    label_to_class[new_key] = v
+            else :
+                labels = df.labels[:max_samples] + num_classes
+                ordered_dataset['labels'].extend(list(labels))
+                for k,v in INDIVIDUAL_CLASS_LABELS[data].items():
+                    new_key = k + num_classes
+                    label_to_class[new_key] = v
+                    yelp_labels[k] = new_key
+                num_classes+=TC_NUM_CLASSES[data]
+
+        elif data == 'amazon':
+            amazon_done = True
+            df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',header=None,names=['labels','title','content'])
+            df.dropna(subset=['content'],inplace=True)
+            content = df.content[:max_samples].apply(preprocess)
+            ordered_dataset['content'].extend(list(content))
+            if yelp_done:
+                labels = df.labels[:max_samples].apply(lambda x: yelp_labels[x])
+                ordered_dataset['labels'].extend(list(labels))
+                for k,v in INDIVIDUAL_CLASS_LABELS[data].items():
+                    new_key = yelp_labels[k]
+                    label_to_class[new_key] = v
+            else :
+                labels = df.labels[:max_samples] + num_classes
+                ordered_dataset['labels'].extend(list(labels))
+                for k,v in INDIVIDUAL_CLASS_LABELS[data].items():
+                    new_key = k + num_classes
+                    label_to_class[new_key] = v
+                    amazon_labels[k] = new_key
+                num_classes+=TC_NUM_CLASSES[data]
+
 
         elif data == 'yahoo':
             df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',header=None,names=['labels','title','content','answer'])
@@ -95,3 +130,5 @@ def create_ordered_tc_data(order,base_location='../data/original_data',save_loca
     ordered_dataframe.to_csv(save_location+'/'+split+'/'+str(order)+'.csv',index=False)
     with open(save_location+'/'+split+'/'+str(order)+'.pkl','wb') as f:
         pickle.dump(label_to_class,f)
+for i in range(4):
+    create_ordered_tc_data(i+1)
