@@ -65,7 +65,6 @@ def train(order,model):
             loss.backward()
             # Update parameters and take a step using the computed gradient
             optimizer.step()
-            scheduler.step()
 
             # Update tracking variables
             tr_loss += loss.item()
