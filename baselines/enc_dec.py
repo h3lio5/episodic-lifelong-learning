@@ -10,10 +10,18 @@ class EncDec(nn.Module):
     def __init__(self):
 
         # Initialize the pretrained bert model for sequence classification
-        self.model = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
+        self.classifier = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
 
-    def forward(content,attn_masks,labels):
 
-        outputs = self.model(content,attention_mask=attn_masks,labels=labels)
+    def classify(self,content,attn_masks,labels):
 
-        return outputs[:2]
+        self.classifier.train()
+        loss,logits = self.classifier(content,attention_mask=attn_masks,labels=labels)
+
+        return loss,logits
+
+    def infer(self,content,attn_masks):
+
+        self.classifier.eval()
+        logits = self.classifier(content,attention_mask=attn_masks)
+        return logits

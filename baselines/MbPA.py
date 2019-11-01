@@ -9,7 +9,7 @@ class MbPA():
     """
     Implements Memory based Parameter Adaptation model
     """
-    def __init__(self,K=32,L=30,retrieval='nearest'):
+    def __init__(self,K=32,L=30,retrieval='nearest',use_cuda = True):
         super(MbPA).__init__(self)
         # Key network to find key representation of content
         self.key_enc = transformers.BertModel.from_pretrained('bert-base-uncased')
@@ -25,6 +25,7 @@ class MbPA():
         self.L = L
         # mode of retrieval of examples from memory
         self.mode = retrieval
+        self.use_cuda = use_cuda
 
     def classify(self,content,attention_mask,labels):
         """
@@ -130,4 +131,4 @@ class MbPA():
         keys = last_hidden_states[:,0,:].cpu().numpy()
         # update the memory dictionary
         for i,key in enumerate(keys):
-            self.memory.update({key:(content[i].cpu().numpy(),attn_masks[i].cpu().numpy(),labels[i].cpu().numpy())})
+            self.memory.update({key:(contents[i].cpu().numpy(),attn_masks[i].cpu().numpy(),labels[i].cpu().numpy())})
