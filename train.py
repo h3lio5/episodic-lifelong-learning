@@ -2,6 +2,7 @@ import torch
 import torch.utils.data as data
 from data_loader import DataSet
 import argparse
+from baselines.enc_dec import EncDec
 import transformers
 from tqdm import trange
 import pdb
@@ -25,7 +26,7 @@ def train(order,model):
     train_data = DataSet(order,split='train')
     train_sampler = data.SequentialSampler(train_data)
     train_dataloader = data.DataLoader(train_data,sampler=train_sampler,batch_size=args.batch_size)
-    param_optimizer = list(model.named_parameters())
+    param_optimizer = list(model.classifier.named_parameters())
     # parameters that need not be decayed
     no_decay = ['bias', 'gamma', 'beta']
     # Grouping the parameters based on whether each parameter undergoes decay or not.
@@ -43,7 +44,7 @@ def train(order,model):
          # Training begins
 
          # Set our model to training mode (as opposed to evaluation mode)
-        model.train()
+        model.classifier.train()
         # Tracking variables
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
@@ -51,6 +52,7 @@ def train(order,model):
         for step, batch in enumerate(train_dataloader):
             # Unpacking the batch items
             content,attn_masks,labels = batch
+            print("step ",step+1)
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
                 content = content.cuda()
@@ -59,7 +61,7 @@ def train(order,model):
             # Clear out the gradients (by default they accumulate)
             optimizer.zero_grad()
             # Forward pass
-            loss,logits = model(content.squeeze(1),attention_mask=attn_masks.squeeze(1),labels=labels.squeeze(1))
+            loss,logits = model.classify(content.squeeze(1),attn_masks.squeeze(1),labels.squeeze(1))
             train_loss_set.append(loss.item())
             # Backward pass
             loss.backward()
@@ -131,14 +133,14 @@ def save_trainloss():
 
 if __name__ == '__main__':
 
-    model = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
+    model = EncDec()
 
     if args.mode == 'train':
         train(args.order,model)
         # save train_loss graph
         save_trainloss()
         # save model state
-        model.save_pretrained('./models/enc_dec.pth')
+        model.classifier.save_pretrained('./models/enc_dec_classifier.pth')
 
     if args.mode == 'test':
         test(model)
