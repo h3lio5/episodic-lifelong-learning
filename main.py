@@ -55,7 +55,7 @@ def train(order,model):
         for step, batch in enumerate(train_dataloader):
             # Unpacking the batch items
             content,attn_masks,labels = batch
-            print("step ",step+1)
+            print("Epoch ",epoch+1,"step ",step+1)
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
                 content = content.cuda()
