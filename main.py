@@ -5,7 +5,7 @@ import argparse
 from baselines.enc_dec import EncDec
 import transformers
 from tqdm import trange
-import pdb
+import time
 import matplotlib.pyplot as plt
 use_cuda = True if torch.cuda.is_available() else False
 
@@ -23,6 +23,8 @@ def train(order,model):
     """
     if use_cuda:
         model.cuda()
+    # time at the start of training    
+    start = time.time()
 
     train_data = DataSet(order,split='train')
     train_sampler = data.SequentialSampler(train_data)
@@ -74,7 +76,9 @@ def train(order,model):
             nb_tr_examples += content.size(0)
             nb_tr_steps += 1
 
+        now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
+        print("Time taken till now: {} hours".format((now-start)/3600)
         model.classifier.save_pretrained('./models/enc_dec_classifier_'+str(order)+'epoch_'+str(epoch)+'.pth')
     save_trainloss(train_loss_set)    
 
@@ -141,8 +145,5 @@ if __name__ == '__main__':
     if args.mode == 'train':
         train(args.order,model)
        
-        
-       
-
     if args.mode == 'test':
         test(model)
