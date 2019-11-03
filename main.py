@@ -6,6 +6,7 @@ from baselines.enc_dec import EncDec
 import transformers
 from tqdm import trange
 import pdb
+import matplotlib.pyplot as plt
 use_cuda = True if torch.cuda.is_available() else False
 
 parser = argparse.ArgumentParser()
@@ -74,6 +75,8 @@ def train(order,model):
             nb_tr_steps += 1
 
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
+        model.classifier.save_pretrained('./models/enc_dec_classifier_'+str(order)+'epoch_'+str(epoch)+'.pth')
+    save_trainloss(train_loss_set)    
 
 # Function to calculate the accuracy of our predictions vs labels
 def flat_accuracy(preds, labels):
@@ -121,7 +124,7 @@ def test(model):
     print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
 
 
-def save_trainloss():
+def save_trainloss(train_loss_set):
 
     plt.figure(figsize=(15,8))
     plt.title("Training loss")
@@ -137,10 +140,9 @@ if __name__ == '__main__':
 
     if args.mode == 'train':
         train(args.order,model)
-        # save train_loss graph
-        save_trainloss()
-        # save model state
-        model.classifier.save_pretrained('./models/enc_dec_classifier.pth')
+       
+        
+       
 
     if args.mode == 'test':
         test(model)
