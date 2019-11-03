@@ -146,4 +146,5 @@ if __name__ == '__main__':
         train(args.order,model)
        
     if args.mode == 'test':
+        
         test(model)
