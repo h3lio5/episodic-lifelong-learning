@@ -78,7 +78,7 @@ def train(order,model):
 
         now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
-        print("Time taken till now: {} hours".format((now-start)/3600)
+        print("Time taken till now: {} hours".format((now-start)/3600))
         model.classifier.save_pretrained('./models/enc_dec_classifier_'+str(order)+'epoch_'+str(epoch)+'.pth')
     save_trainloss(train_loss_set)    
 
