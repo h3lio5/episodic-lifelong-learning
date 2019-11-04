@@ -15,7 +15,7 @@ class EncDec(nn.Module):
         elif mode == 'test':
             self.classifier = transformers.BertForSequenceClassification()
             self.classifier.load_state_dict(model_state)
-            
+            self.classifier.eval()
 
     def classify(self,content,attn_masks,labels):
 
