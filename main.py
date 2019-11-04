@@ -83,17 +83,16 @@ def train(order,model):
     save_trainloss(train_loss_set)    
 
 # Function to calculate the accuracy of our predictions vs labels
-def flat_accuracy(preds, labels):
+def num_correct(preds, labels):
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
-    return np.sum(pred_flat == labels_flat) / len(labels_flat)
+    return np.sum(pred_flat == labels_flat) 
 
-def test(model):
+def test(order,model):
     """
     evaluate the model for accuracy
     """
-    # set the model to evaluation mode
-    model.eval()
+
     if use_cuda:
         model.cuda()
 
@@ -115,15 +114,15 @@ def test(model):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         with torch.no_grad():
             # Forward pass, calculate logit predictions
-            logits = model(content.squeeze(1),attention_mask=attn_masks.squeeze(1))
+            logits = model.infer(content.squeeze(1),attention_mask=attn_masks.squeeze(1))
 
         logits = logits.detach().cpu().numpy()
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
-        labels = labels.squeeze(1).numpy()
-        tmp_eval_accuracy = flat_accuracy(logits, labels)
-        eval_accuracy += tmp_eval_accuracy
-        nb_eval_steps += 1
+        labels = labels.squeeze(1)
+        tmp_correct = num_correct(logits, labels)
+        total_correct += tmp_correct
+        total_samples += len(labels)
 
     print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
 
@@ -146,5 +145,6 @@ if __name__ == '__main__':
         train(args.order,model)
        
     if args.mode == 'test':
-        
-        test(model)
+        model_state = torch.load('./models/enc_dec_classifier_1epoch_3.pth')
+        model = EncDec(mode='test',model_state=model_state)
+        test(args.order,model)
