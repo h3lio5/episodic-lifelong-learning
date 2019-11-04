@@ -103,7 +103,7 @@ def test(order,model):
     test_dataloader = data.DataLoader(test_data,sampler=test_sampler,batch_size=args.batch_size)
 
     # Tracking variables
-    total_correct,tmp_correct, total_samples = 0, 0,0
+    total_correct,tmp_correct, t_steps = 0, 0,0
 
     print("Validation step started...")
     for step,batch in enumerate(test_dataloader):
@@ -123,11 +123,11 @@ def test(order,model):
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
         labels = labels.squeeze(1).numpy()
-        tmp_correct = num_correct(logits, labels)
+        tmp_correct = flat_accuracy(logits, labels)
         total_correct += tmp_correct
-        total_samples += len(labels)
+        t_steps += 1
 
-    print("Validation Accuracy: {}".format(total_correct/total_samples))
+    print("Validation Accuracy: {}".format(total_correct/t_steps))
 
 
 def save_trainloss(train_loss_set):
