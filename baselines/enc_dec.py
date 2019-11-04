@@ -12,6 +12,7 @@ class EncDec(nn.Module):
         # Initialize the pretrained bert model for sequence classification
         if mode == 'train':
             self.classifier = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
+            self.classifier.train()
         elif mode == 'test':
             self.classifier = transformers.BertForSequenceClassification()
             self.classifier.load_state_dict(model_state)
