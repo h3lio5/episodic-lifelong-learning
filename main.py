@@ -80,7 +80,7 @@ def train(order,model):
         now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
         print("Time taken till now: {} hours".format((now-start)/3600))
-        torch.save(model.classifier.state_dict(),'../model_checkpoints/'+MODEL_NAME'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
+        torch.save(model.classifier.state_dict(),'../model_checkpoints/'+MODEL_NAME+'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
     save_trainloss(train_loss_set)    
 
 # Function to calculate the accuracy of our predictions vs labels
@@ -135,7 +135,7 @@ def save_trainloss(train_loss_set):
     plt.xlabel("Batch")
     plt.ylabel("Loss")
     plt.plot(train_loss_set)
-    plt.savefig('./train_loss.png')
+    plt.savefig('../loss_images/'+MODEL_NAME+'/train_loss.png')
 
 
 if __name__ == '__main__':
