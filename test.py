@@ -1,9 +1,11 @@
-import pandas as pd
+import transformers 
+import torch
 
-for i in range(4):
-    df = pd.read_csv('../data/ordered_data/train/' + str(i+1) +'.csv')
-    print(df.shape)
-    print(df.columns)
-    # df.dropna(subset=['content'],inplace=True)
-    # print(df)
-    # df.to_csv('../data/ordered_data/train/' + str(i+1) +'.csv',index=False)
+model = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
+tokenizer = transformers.BertTokenizer.from_pretrained('bert-base-uncased')
+input_ids = torch.tensor(tokenizer.encode("Hello, my dog is cute")).unsqueeze(0)  # Batch size 1
+logits, = model(input_ids)
+print(logits)
+print(type(logits))
+print(logits[0])
+print(len(logits))
