@@ -123,7 +123,7 @@ def test(order,model):
         logits = logits.detach().cpu().numpy()
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
-        labels = labels.squeeze(1)
+        labels = labels.squeeze(1).numpy()
         tmp_correct = num_correct(logits, labels)
         total_correct += tmp_correct
         total_samples += len(labels)
