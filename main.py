@@ -124,7 +124,7 @@ def test(order,model):
         total_correct += tmp_correct
         total_samples += len(labels)
 
-    print("Validation Accuracy: {}".format(eval_accuracy/nb_eval_steps))
+    print("Validation Accuracy: {}".format(total_correct/total_samples))
 
 
 def save_trainloss(train_loss_set):
