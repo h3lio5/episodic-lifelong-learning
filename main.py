@@ -112,8 +112,8 @@ def test(order,model):
         content,attn_masks,labels = batch
 
         if use_cuda:
-            content.cuda()
-            attn_masks.cuda()
+            content = content.cuda()
+            attn_masks = attn_masks.cuda()
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         with torch.no_grad():
             # Forward pass, calculate logit predictions
