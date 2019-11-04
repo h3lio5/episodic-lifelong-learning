@@ -17,6 +17,7 @@ parser.add_argument('--epochs',default=4,type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
+MODEL_NAME = 'enc_dec'
 
 def train(order,model):
     """
@@ -79,7 +80,7 @@ def train(order,model):
         now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
         print("Time taken till now: {} hours".format((now-start)/3600))
-        torch.save(model.classifier.state_dict(),'./models/enc_dec_classifier_'+str(order)+'epoch_'+str(epoch)+'.pth')
+        torch.save(model.classifier.state_dict(),'../model_checkpoints/'+MODEL_NAME'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
     save_trainloss(train_loss_set)    
 
 # Function to calculate the accuracy of our predictions vs labels
@@ -145,6 +146,6 @@ if __name__ == '__main__':
         train(args.order,model)
        
     if args.mode == 'test':
-        model_state = torch.load('./models/enc_dec_classifier_1epoch_3.pth')
+        model_state = torch.load('../model_checkpoints/enc_dec_classifier_1epoch_3.pth')
         model = EncDec(mode='test',model_state=model_state)
         test(args.order,model)
