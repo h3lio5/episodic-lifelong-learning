@@ -99,8 +99,7 @@ def test(order,model):
         model.cuda()
 
     test_data = DataSet(order,split='test')
-    test_sampler = data.SequentialSampler(test_data)
-    test_dataloader = data.DataLoader(test_data,sampler=test_sampler,batch_size=args.batch_size)
+    test_dataloader = data.DataLoader(test_data,shuffle=True,batch_size=args.batch_size)
 
     # Tracking variables
     total_correct,tmp_correct, t_steps = 0, 0,0
