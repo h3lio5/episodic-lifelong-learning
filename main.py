@@ -105,8 +105,10 @@ def test(order,model):
     eval_loss, eval_accuracy = 0, 0
     nb_eval_steps, nb_eval_examples = 0, 0
 
-    for batch in (test_dataloader):
-
+    print("Validation step started...")
+    for step,batch in enumerate(test_dataloader):
+        
+        print("Step",step)
         content,attn_masks,labels = batch
 
         if use_cuda:
@@ -115,7 +117,7 @@ def test(order,model):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         with torch.no_grad():
             # Forward pass, calculate logit predictions
-            logits = model.infer(content.squeeze(1),attention_mask=attn_masks.squeeze(1))
+            logits = model.infer(content.squeeze(1),attn_masks.squeeze(1))
 
         logits = logits.detach().cpu().numpy()
         # Dropping the 1 dim to match the logits' shape
