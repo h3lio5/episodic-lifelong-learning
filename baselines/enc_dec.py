@@ -7,11 +7,15 @@ class EncDec(nn.Module):
     """
     """
 
-    def __init__(self):
+    def __init__(self,mode='train',model_state=None):
         super(EncDec,self).__init__()
         # Initialize the pretrained bert model for sequence classification
-        self.classifier = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
-
+        if mode == 'train':
+            self.classifier = transformers.BertForSequenceClassification.from_pretrained('bert-base-uncased',num_labels=33)
+        elif mode == 'test':
+            self.classifier = transformers.BertForSequenceClassification()
+            self.classifier.load_state_dict(model_state)
+            
 
     def classify(self,content,attn_masks,labels):
 
