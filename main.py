@@ -7,6 +7,7 @@ import transformers
 from tqdm import trange
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 use_cuda = True if torch.cuda.is_available() else False
 
 parser = argparse.ArgumentParser()
