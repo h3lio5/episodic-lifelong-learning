@@ -146,6 +146,6 @@ if __name__ == '__main__':
         train(args.order,model)
        
     if args.mode == 'test':
-        model_state = torch.load('../model_checkpoints/enc_dec_classifier_1epoch_3.pth')
+        model_state = torch.load('../model_checkpoints/enc_dec/enc_dec_classifier_1epoch_3.pth')
         model = EncDec(mode='test',model_state=model_state)
         test(args.order,model)
