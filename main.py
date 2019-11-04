@@ -103,8 +103,7 @@ def test(order,model):
     test_dataloader = data.DataLoader(test_data,sampler=test_sampler,batch_size=args.batch_size)
 
     # Tracking variables
-    eval_loss, eval_accuracy = 0, 0
-    nb_eval_steps, nb_eval_examples = 0, 0
+    total_correct,tmp_correct, total_samples = 0, 0,0
 
     print("Validation step started...")
     for step,batch in enumerate(test_dataloader):
