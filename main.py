@@ -11,26 +11,31 @@ import numpy as np
 use_cuda = True if torch.cuda.is_available() else False
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size',type=int,default=16,help='Enter the batch size')
-parser.add_argument('--mode',default='train',help='Enter the mode - train/eval')
-parser.add_argument('--order',default=1,type=int,help='Enter the dataset order - 1/2/3/4')
-parser.add_argument('--epochs',default=4,type=int)
+parser.add_argument('--batch_size', type=int, default=16,
+                    help='Enter the batch size')
+parser.add_argument('--mode', default='train',
+                    help='Enter the mode - train/eval')
+parser.add_argument('--order', default=1, type=int,
+                    help='Enter the dataset order - 1/2/3/4')
+parser.add_argument('--epochs', default=4, type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
 MODEL_NAME = 'enc_dec'
 
-def train(order,model):
+
+def train(order, model):
     """
     """
     if use_cuda:
         model.cuda()
-    # time at the start of training    
+    # time at the start of training
     start = time.time()
 
-    train_data = DataSet(order,split='train')
+    train_data = DataSet(order, split='train')
     train_sampler = data.SequentialSampler(train_data)
-    train_dataloader = data.DataLoader(train_data,sampler=train_sampler,batch_size=args.batch_size)
+    train_dataloader = data.DataLoader(
+        train_data, sampler=train_sampler, batch_size=args.batch_size)
     param_optimizer = list(model.classifier.named_parameters())
     # parameters that need not be decayed
     no_decay = ['bias', 'gamma', 'beta']
@@ -39,13 +44,15 @@ def train(order,model):
         {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
          'weight_decay_rate': 0.01},
         {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)],
-         'weight_decay_rate': 0.0} ]
-    optimizer = transformers.AdamW(optimizer_grouped_parameters,lr=LEARNING_RATE)
-    scheduler = transformers.WarmupLinearSchedule(optimizer,warmup_steps=100,t_total=1000)
+         'weight_decay_rate': 0.0}]
+    optimizer = transformers.AdamW(
+        optimizer_grouped_parameters, lr=LEARNING_RATE)
+    scheduler = transformers.WarmupLinearSchedule(
+        optimizer, warmup_steps=100, t_total=1000)
     # Store our loss and accuracy for plotting
     train_loss_set = []
     # trange is a tqdm wrapper around the normal python range
-    for epoch in trange(args.epochs,desc="Epoch"):
+    for epoch in trange(args.epochs, desc="Epoch"):
          # Training begins
 
          # Set our model to training mode (as opposed to evaluation mode)
@@ -53,11 +60,11 @@ def train(order,model):
         # Tracking variables
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
-         # Train the data for one epoch
+        # Train the data for one epoch
         for step, batch in enumerate(train_dataloader):
             # Unpacking the batch items
-            content,attn_masks,labels = batch
-            print("Epoch ",epoch+1,"step ",step+1)
+            content, attn_masks, labels = batch
+            print("Epoch ", epoch+1, "step ", step+1)
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
                 content = content.cuda()
@@ -66,7 +73,8 @@ def train(order,model):
             # Clear out the gradients (by default they accumulate)
             optimizer.zero_grad()
             # Forward pass
-            loss,logits = model.classify(content.squeeze(1),attn_masks.squeeze(1),labels.squeeze(1))
+            loss, logits = model.classify(content.squeeze(
+                1), attn_masks.squeeze(1), labels.squeeze(1))
             train_loss_set.append(loss.item())
             # Backward pass
             loss.backward()
@@ -81,16 +89,20 @@ def train(order,model):
         now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
         print("Time taken till now: {} hours".format((now-start)/3600))
-        torch.save(model.classifier.state_dict(),'../model_checkpoints/'+MODEL_NAME+'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
-    save_trainloss(train_loss_set)    
+        torch.save(model.classifier.state_dict(), '../model_checkpoints/' +
+                   MODEL_NAME+'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
+    save_trainloss(train_loss_set)
 
 # Function to calculate the accuracy of our predictions vs labels
+
+
 def flat_accuracy(preds, labels):
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
     return np.sum(pred_flat == labels_flat) / len(labels_flat)
 
-def test(order,model):
+
+def test(order, model):
     """
     evaluate the model for accuracy
     """
@@ -98,17 +110,18 @@ def test(order,model):
     if use_cuda:
         model.cuda()
 
-    test_data = DataSet(order,split='test')
-    test_dataloader = data.DataLoader(test_data,shuffle=True,batch_size=args.batch_size)
+    test_data = DataSet(order, split='test')
+    test_dataloader = data.DataLoader(
+        test_data, shuffle=True, batch_size=args.batch_size)
 
     # Tracking variables
-    total_correct,tmp_correct, t_steps = 0, 0,0
+    total_correct, tmp_correct, t_steps = 0, 0, 0
 
     print("Validation step started...")
-    for step,batch in enumerate(test_dataloader):
-        
-        print("Step",step)
-        content,attn_masks,labels = batch
+    for step, batch in enumerate(test_dataloader):
+
+        print("Step", step)
+        content, attn_masks, labels = batch
 
         if use_cuda:
             content = content.cuda()
@@ -116,7 +129,7 @@ def test(order,model):
         # Telling the model not to compute or store gradients, saving memory and speeding up validation
         with torch.no_grad():
             # Forward pass, calculate logit predictions
-            logits = model.infer(content.squeeze(1),attn_masks.squeeze(1))
+            logits = model.infer(content.squeeze(1), attn_masks.squeeze(1))
 
         logits = logits.detach().cpu().numpy()
         # Dropping the 1 dim to match the logits' shape
@@ -131,7 +144,7 @@ def test(order,model):
 
 def save_trainloss(train_loss_set):
 
-    plt.figure(figsize=(15,8))
+    plt.figure(figsize=(15, 8))
     plt.title("Training loss")
     plt.xlabel("Batch")
     plt.ylabel("Loss")
@@ -144,9 +157,10 @@ if __name__ == '__main__':
     model = EncDec()
 
     if args.mode == 'train':
-        train(args.order,model)
-       
+        train(args.order, model)
+
     if args.mode == 'test':
-        model_state = torch.load('../model_checkpoints/enc_dec/enc_dec_classifier_1epoch_3.pth')
-        model = EncDec(mode='test',model_state=model_state)
-        test(args.order,model)
+        model_state = torch.load(
+            '../model_checkpoints/enc_dec/enc_dec_classifier_1epoch_3.pth')
+        model = EncDec(mode='test', model_state=model_state)
+        test(args.order, model)
