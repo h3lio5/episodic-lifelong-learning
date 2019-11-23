@@ -11,7 +11,8 @@ class DataSet(data.Dataset):
         df = pd.read_csv('../data/ordered_data/'+split+'/'+str(order)+'.csv')
         self.labels = df.labels.values
         self.content = df.content.values
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.tokenizer = BertTokenizer.from_pretrained(
+            '../pretrained_bert/bert-base-uncased-vocab.txt')
 
     def __len__(self):
 
