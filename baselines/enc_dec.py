@@ -15,8 +15,7 @@ class EncDec(nn.Module):
                 'bert-base-uncased', num_labels=33)
             self.classifier.train()
         elif mode == 'test':
-            # config = transformers.BertConfig.from_pretrained(
-            #            'bert-base-uncased', num_labels=33)
+            # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
             config = transformers.BertConfig.from_pretrained(
                 '../pretrained_bert/bert-base-uncased-config.json', num_labels=33)
             self.classifier = transformers.BertForSequenceClassification(
