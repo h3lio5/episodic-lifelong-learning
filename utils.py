@@ -37,11 +37,31 @@ INDIVIDUAL_CLASS_LABELS = {
                               'agnews':{1:'World',2:'Sports',3:'Business',4:'Sci/Tech'}
                         }
 
-# removes hyperlinks
-preprocess = (lambda x: re.sub(r"https?:\/\/\S+\b|www\.(\w+\.)+\S*", "",str(x)))
+def preprocess(text):
+    """
+    Preprocesses the text 
+    """
+    text = text.lower()
+    # removes '\n' present explicitly
+    text = text.replace(u"\n",u" ")
+    # removes unnecessary space
+    text = re.sub(r"(\s){2,}",u" ",text)
+    # replaces repeated punctuation marks with single punctuation followed by a space
+    # e.g, what???? -> what?
+    text = re.sub(r"([.?!]){2,}",r"\1",text)
+    # appends space to $ which will help during tokenization
+    text = text.replace(u"$",u"$ ")
+    # removes fractions
+    text = re.sub(r"(\d+)\/(\d+)","number",text)
+    # replace decimal of the type x.y with x, e.g, 1.25 -> 1
+    text = re.sub(r"(\d+)\.(\d+)",r"\1",text)
+    # removes hyperlinks
+    text = re.sub(r"https?:\/\/\S+\b|www\.(\w+\.)+\S*", "",text)
 
 
 
+df = pd.read_csv('../data/ordered_data/train/1.csv')
+print(df.content.values[7])
 def create_ordered_tc_data(order,base_location='../data/original_data',save_location='../data/ordered_data',split='train'):
     """
     creates ordered dataset for text classification with a maximum of 115,000 sequences
