@@ -43,11 +43,11 @@ INDIVIDUAL_CLASS_LABELS = {
 
 def preprocess(text):
     """
-    Preprocesses the text 
+    Preprocesses the text
     """
     text = text.lower()
     # removes '\n' present explicitly
-    text = text.replace(u"\n", u" ")
+    text = re.sub(r"(\\n)+", " ", text)
     # removes unnecessary space
     text = re.sub(r"(\s){2,}", u" ", text)
     # replaces repeated punctuation marks with single punctuation followed by a space
@@ -63,7 +63,7 @@ def preprocess(text):
     # 1280 = 128 (seq length) * 10((assumed avg. word size) 8 + (spaces on both sides) 2 = 10))
     # Note: our model uses sequences of length 128
     text = text[:1280]
-    return text
+    return str(text)
 
 
 def create_ordered_tc_data(order, base_location='../data/original_data', save_location='../data/ordered_data', split='train'):
@@ -89,9 +89,9 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             df = pd.read_csv(base_location+'/'+split+'/'+data +
                              '.csv', header=None, names=['labels', 'content'])
             df.dropna(subset=['content'], inplace=True)
-            df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
+            df.loc[:, 'content'] = df.content.apply(preprocess)
             if amazon_done:
-                df.loc[:, 'labels'] = df.labels.swifter.apply(
+                df.loc[:, 'labels'] = df.labels.apply(
                     lambda x: amazon_labels[x])
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = amazon_labels[k]
@@ -114,9 +114,9 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',
                              header=None, names=['labels', 'title', 'content'])
             df.dropna(subset=['content'], inplace=True)
-            df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
+            df.loc[:, 'content'] = df.content.apply(preprocess)
             if yelp_done:
-                df.loc[:, 'labels'] = df.labels.swifter.apply(
+                df.loc[:, 'labels'] = df.labels.apply(
                     lambda x: yelp_labels[x])
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = yelp_labels[k]
@@ -139,7 +139,7 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
                              header=None, names=['labels', 'title', 'content', 'answer'])
             df.dropna(subset=['content'], inplace=True)
             df.loc[:, 'labels'] = df.labels + num_classes
-            df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
+            df.loc[:, 'content'] = df.content.apply(preprocess)
             # filter rows with length greater than 20 (2 words including spaces on average)
             df.drop(df[df['content'].map(len) < 20].index, inplace=True)
             ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
@@ -156,7 +156,7 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
                              header=None, names=['labels', 'title', 'content'])
             df.dropna(subset=['content'], inplace=True)
             df.loc[:, 'labels'] = df.labels + num_classes
-            df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
+            df.loc[:, 'content'] = df.content.apply(preprocess)
             # filter rows with length greater than 20 (2 words including spaces on average)
             df.drop(df[df['content'].map(len) < 20].index, inplace=True)
             ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
@@ -178,10 +178,10 @@ if __name__ == "__main__":
 
     # create ordered dataset
     total_time = 0
-    for i in range(4):
-        print("Started for order {}".format(i+1))
+    for i in range(2):
+        print("Started for order {}".format(i+2))
         start = time.time()
-        create_ordered_tc_data(i+1, split='train')
+        create_ordered_tc_data(i+2, split='train')
         end = time.time()
         print("Time taken for order {} : {} minutes".format(i+1, (end-start)/60))
         total_time += (end-start)/60
