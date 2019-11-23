@@ -21,7 +21,7 @@ class DataSet(data.Dataset):
         return len(self.labels)
 
     def __getitem__(self, index):
-
+        content = self.content[index]
         content_ids = self.tokenizer.encode(content)
         padded_content_ids = self._add_spl_ids_and_pad(content_ids)
         # Create attention mask
