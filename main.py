@@ -35,7 +35,7 @@ def train(order, model):
     train_data = DataSet(order, split='train')
     train_sampler = data.SequentialSampler(train_data)
     train_dataloader = data.DataLoader(
-        train_data, sampler=train_sampler, batch_size=args.batch_size)
+        train_data, sampler=train_sampler, batch_size=args.batch_size, num_workers=4)
     param_optimizer = list(model.classifier.named_parameters())
     # parameters that need not be decayed
     no_decay = ['bias', 'gamma', 'beta']
@@ -89,8 +89,9 @@ def train(order, model):
         now = time.time()
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
         print("Time taken till now: {} hours".format((now-start)/3600))
-        torch.save(model.classifier.state_dict(), '../model_checkpoints/' +
-                   MODEL_NAME+'/classifier_order_'+str(order)+'epoch_'+str(epoch)+'.pth')
+        model_dict = model.save_state()
+        torch.save(model_dict, '../model_checkpoints/' +
+                   MODEL_NAME+'/classifier_order_'+str(order)+'_epoch_'+str(epoch)+'.pth')
     save_trainloss(train_loss_set)
 
 # Function to calculate the accuracy of our predictions vs labels
