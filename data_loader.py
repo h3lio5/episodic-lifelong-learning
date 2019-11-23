@@ -14,7 +14,7 @@ class DataSet(data.Dataset):
         # If vocab.txt not available locally, then
         # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.tokenizer = BertTokenizer.from_pretrained(
-            '../pretrained_bert/bert-base-uncased-vocab.txt')
+            '../pretrained_bert_tc/vocab.txt')
 
     def __len__(self):
 
