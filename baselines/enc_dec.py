@@ -11,14 +11,19 @@ class EncDec(nn.Module):
         super(EncDec, self).__init__()
         # Initialize the pretrained bert model for sequence classification
         if mode == 'train':
+            # from_pretrained() loads weights, config from the files
+            # pytorch_model.bin and config.json if available in the directory provided
             self.classifier = transformers.BertForSequenceClassification.from_pretrained(
-                '', num_labels=33)
+                '../pretrained_bert_tc')
+            # If weigths and config not saved locally then
+            # self.classifier = transformers.BertForSequenceClassification.from_pretrained(
+            #    'bert-base-uncased', num_labels=33)
             self.classifier.train()
         elif mode == 'test':
             # If config file not locally available, then
             # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
             config = transformers.BertConfig.from_pretrained(
-                '../pretrained_bert/bert-base-uncased-config.json', num_labels=33)
+                '../pretrained_bert_tc/config.json', num_labels=33)
             self.classifier = transformers.BertForSequenceClassification(
                 config)
             self.classifier.load_state_dict(model_state)
