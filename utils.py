@@ -3,6 +3,7 @@ import numpy as np
 import re
 import pickle
 import swifter
+import time
 
 TC_NUM_CLASSES = {
     'yelp': 5,
@@ -92,20 +93,18 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             if amazon_done:
                 df.loc[:, 'labels'] = df.labels.swifter.apply(
                     lambda x: amazon_labels[x])
-                # filter rows with length greater than 20 (2 words including spaces on average)
-                df = df[df['content'].map(len) > 20]
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = amazon_labels[k]
                     label_to_class[new_key] = v
             else:
                 df.loc[:, 'labels'] = df.labels + num_classes
-                # filter rows with length greater than 20 (2 words including spaces on average)
-                df = df[df['content'].map(len) > 20]
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = k + num_classes
                     label_to_class[new_key] = v
                     yelp_labels[k] = new_key
                 num_classes += TC_NUM_CLASSES[data]
+            # filter rows with length greater than 20 (2 words including spaces on average)
+            df.drop(df[df['content'].map(len) < 20].index, inplace=True)
             ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
             ordered_dataset['content'].extend(
                 list(df.content[:max_samples]))
@@ -119,20 +118,18 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             if yelp_done:
                 df.loc[:, 'labels'] = df.labels.swifter.apply(
                     lambda x: yelp_labels[x])
-                # filter rows with length greater than 20 (2 words including spaces on average)
-                df = df[df['content'].map(len) > 20]
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = yelp_labels[k]
                     label_to_class[new_key] = v
             else:
                 df.loc[:, 'labels'] = df.labels + num_classes
-                # filter rows with length greater than 20 (2 words including spaces on average)
-                df = df[df['content'].map(len) > 20]
                 for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                     new_key = k + num_classes
                     label_to_class[new_key] = v
                     amazon_labels[k] = new_key
                 num_classes += TC_NUM_CLASSES[data]
+            # filter rows with length greater than 20 (2 words including spaces on average)
+            df.drop(df[df['content'].map(len) < 20].index, inplace=True)
             ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
             ordered_dataset['content'].extend(
                 list(df.content[:max_samples]))
@@ -144,9 +141,9 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             df.loc[:, 'labels'] = df.labels + num_classes
             df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
             # filter rows with length greater than 20 (2 words including spaces on average)
-            df = df[df['content'].map(len) > 20]
+            df.drop(df[df['content'].map(len) < 20].index, inplace=True)
             ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
-            ordered_dataset['content'].extend(list(df.content[:, max_samples]))
+            ordered_dataset['content'].extend(list(df.content[: max_samples]))
             # Mapping new labels to classes
             for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
                 new_key = k + num_classes
@@ -161,8 +158,8 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             df.loc[:, 'labels'] = df.labels + num_classes
             df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
             # filter rows with length greater than 20 (2 words including spaces on average)
-            df = df[df['content'].map(len) > 20]
-            ordered_dataset['labels'].extend(list(df.labels[:, max_samples]))
+            df.drop(df[df['content'].map(len) < 20].index, inplace=True)
+            ordered_dataset['labels'].extend(list(df.labels[:max_samples]))
             ordered_dataset['content'].extend(list(df.content[:max_samples]))
             # Mapping new labels to classes
             for k, v in INDIVIDUAL_CLASS_LABELS[data].items():
@@ -177,7 +174,15 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
         pickle.dump(label_to_class, f)
 
 
-fil = open('../data/ordered_data/train/1.pkl', 'rb')
-a = pickle.load(fil)
-for k, v in a.items():
-    print(k, v)
+if __name__ == "__main__":
+
+    # create ordered dataset
+    total_time = 0
+    for i in range(4):
+        print("Started for order {}".format(i+1))
+        start = time.time()
+        create_ordered_tc_data(i+1, split='train')
+        end = time.time()
+        print("Time taken for order {} : {} minutes".format(i+1, (end-start)/60))
+        total_time += (end-start)/60
+    print("Total time taken: {}".format(total_time))
