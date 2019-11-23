@@ -33,3 +33,10 @@ class EncDec(nn.Module):
 
         logits, = self.classifier(content, attention_mask=attn_masks)
         return logits
+
+    def save_state(self):
+
+        model_state = dict()
+        model_state['classifier'] = self.classifier.state_dict()
+
+        return model_state
