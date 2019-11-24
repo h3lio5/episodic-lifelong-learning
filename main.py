@@ -27,15 +27,19 @@ MODEL_NAME = 'enc_dec'
 def train(order, model):
     """
     """
+    workers = 0
     if use_cuda:
         model.cuda()
+        # Number of workers should be 4*num_gpu_available
+        # https://discuss.pytorch.org/t/guidelines-for-assigning-num-workers-to-dataloader/813/5
+        workers = 4
     # time at the start of training
     start = time.time()
 
     train_data = DataSet(order, split='train')
     train_sampler = data.SequentialSampler(train_data)
     train_dataloader = data.DataLoader(
-        train_data, sampler=train_sampler, batch_size=args.batch_size, num_workers=4)
+        train_data, sampler=train_sampler, batch_size=args.batch_size, num_workers=workers)
     param_optimizer = list(model.classifier.named_parameters())
     # parameters that need not be decayed
     no_decay = ['bias', 'gamma', 'beta']
