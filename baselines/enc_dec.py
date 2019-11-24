@@ -15,10 +15,10 @@ class EncDec(nn.Module):
             # pytorch_model.bin and config.json if available in the directory provided
             self.classifier = transformers.BertForSequenceClassification.from_pretrained(
                 '../pretrained_bert_tc')
-            # If weigths and config not saved locally then
+            # If weigths and config not saved locally then the model will be downloaded
             # self.classifier = transformers.BertForSequenceClassification.from_pretrained(
             #    'bert-base-uncased', num_labels=33)
-            self.classifier.train()
+
         elif mode == 'test':
             # If config file not locally available, then
             # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
@@ -27,7 +27,6 @@ class EncDec(nn.Module):
             self.classifier = transformers.BertForSequenceClassification(
                 config)
             self.classifier.load_state_dict(model_state)
-            self.classifier.eval()
 
     def classify(self, content, attn_masks, labels):
 
