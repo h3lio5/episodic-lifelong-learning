@@ -185,6 +185,6 @@ if __name__ == "__main__":
         start = time.time()
         create_ordered_tc_data(i+1, split='train')
         end = time.time()
-        print("Time taken for order{} : {} minutes".format(i+1, (end-start)/60))
+        print("Time taken for order {} : {} minutes".format(i+1, (end-start)/60))
         total_time += (end-start)/60
     print("Total time taken: {}".format(total_time))
