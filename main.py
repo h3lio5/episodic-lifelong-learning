@@ -11,7 +11,7 @@ import numpy as np
 use_cuda = True if torch.cuda.is_available() else False
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--batch_size', type=int, default=16,
+parser.add_argument('--batch_size', type=int, default=32,
                     help='Enter the batch size')
 parser.add_argument('--mode', default='train',
                     help='Enter the mode - train/eval')
@@ -55,7 +55,7 @@ def train(order, model):
     for epoch in trange(args.epochs, desc="Epoch"):
          # Training begins
 
-         # Set our model to training mode (as opposed to evaluation mode)
+        # Set our model to training mode (as opposed to evaluation mode)
         model.classifier.train()
         # Tracking variables
         tr_loss = 0
@@ -91,7 +91,7 @@ def train(order, model):
         print("Time taken till now: {} hours".format((now-start)/3600))
         model_dict = model.save_state()
         torch.save(model_dict, '../model_checkpoints/' +
-                   MODEL_NAME+'/classifier_order_'+str(order)+'_epoch_'+str(epoch)+'.pth')
+                   MODEL_NAME+'/classifier_order_'+str(order)+'_epoch_'+str(epoch+1)+'.pth')
     save_trainloss(train_loss_set)
 
 # Function to calculate the accuracy of our predictions vs labels
@@ -155,9 +155,8 @@ def save_trainloss(train_loss_set):
 
 if __name__ == '__main__':
 
-    model = EncDec()
-
     if args.mode == 'train':
+        model = EncDec()
         train(args.order, model)
 
     if args.mode == 'test':
