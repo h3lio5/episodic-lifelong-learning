@@ -194,6 +194,7 @@ if __name__ == "__main__":
         order = 1
     else:
         order = 4
+    print("Started generating {} data".format(args.split))
     for i in range(order):
         print("Started for order {}".format(i+1))
         start = time.time()
