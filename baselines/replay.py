@@ -42,7 +42,7 @@ class ReplayMemory(object):
         labels = []
 
         samples = random.sample(self.memory, sample_size)
-        print"samples ", (len(samples))
+        print("samples ", (len(samples)))
         for content, attn_mask, label in samples:
             contents.append(content)
             attn_masks.append(attn_mask)
