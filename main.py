@@ -10,6 +10,11 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 use_cuda = True if torch.cuda.is_available() else False
+# Use cudnn backends instead of vanilla backends when the input sizes
+# are similar so as to enable cudnn which will try to find optimal set
+# of algorithms to use for the hardware leading to faster runtime.
+torch.backends.cudnn.benchmark = True
+torch.backends.cudnn.enabled = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=32,
