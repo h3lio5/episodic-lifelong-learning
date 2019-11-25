@@ -77,6 +77,9 @@ def train(order, model, memory):
             else:
                 # Unpacking the batch items
                 content, attn_masks, labels = batch
+                content = content.squeeze(1)
+                attn_masks = attn_masks.squeeze(1)
+                labels = labels.squeeze(1)
 
             # Push the examples into the replay memory
             memory.push(batch)
@@ -89,8 +92,7 @@ def train(order, model, memory):
             # Clear out the gradients (by default they accumulate)
             optimizer.zero_grad()
             # Forward pass
-            loss, logits = model.classify(content.squeeze(
-                1), attn_masks.squeeze(1), labels.squeeze(1))
+            loss, logits = model.classify(content, attn_masks, labels)
             train_loss_set.append(loss.item())
             # Backward pass
             loss.backward()
