@@ -49,7 +49,7 @@ class ReplayMemory(object):
             labels.append(label)
         print("content ", len(contents), " type ", type(contents))
         print(contents)
-        return (torch.LongTensor(contents), torch.LongTensor(attn_masks), torch.LongTensor(labels))
+        return (torch.LongTensor(np.asarray(contents)), torch.LongTensor(np.asarray(attn_masks)), torch.LongTensor(np.array(labels))
 
 
 class ReplayModel(nn.Module):
@@ -66,7 +66,7 @@ class ReplayModel(nn.Module):
         if mode == 'train':
             # from_pretrained() loads weights, config from the files
             # pytorch_model.bin and config.json if available in the directory provided
-            self.classifier = transformers.BertForSequenceClassification.from_pretrained(
+            self.classifier=transformers.BertForSequenceClassification.from_pretrained(
                 '../pretrained_bert_tc/model_config')
             # If weigths and config not saved locally then initialize the model using -
             # self.classifier = transformers.BertForSequenceClassification.from_pretrained(
@@ -75,28 +75,28 @@ class ReplayModel(nn.Module):
         elif mode == 'test':
             # If config file not locally available, then
             # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
-            config = transformers.BertConfig.from_pretrained(
+            config=transformers.BertConfig.from_pretrained(
                 '../pretrained_bert_tc/model_config/config.json', num_labels=33)
-            self.classifier = transformers.BertForSequenceClassification(
+            self.classifier=transformers.BertForSequenceClassification(
                 config)
             self.classifier.load_state_dict(model_state['classifier'])
 
     def classify(self, content, attn_masks, labels):
 
         self.classifier.train()
-        loss, logits = self.classifier(
+        loss, logits=self.classifier(
             content, attention_mask=attn_masks, labels=labels)
         return loss, logits
 
     def infer(self, content, attn_masks):
 
         self.classifier.eval()
-        logits = self.classifier(content, attention_mask=attn_masks)
+        logits=self.classifier(content, attention_mask=attn_masks)
         return logits
 
     def save_state(self):
 
-        model_state = dict()
-        model_state['classifier'] = self.classifier.state_dict()
+        model_state=dict()
+        model_state['classifier']=self.classifier.state_dict()
 
         return model_state
