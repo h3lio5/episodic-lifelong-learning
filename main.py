@@ -75,7 +75,7 @@ def train(order, model, memory):
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if (step+1) % REPLAY_FREQ == 0:
                 # sample 100 examples from memory
-                content, attn_masks, labels = memory.sample(sample_size=100)
+                content, attn_masks, labels = memory.sample(sample_size=50)
             else:
                 # Unpacking the batch items
                 content, attn_masks, labels = batch
