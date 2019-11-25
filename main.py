@@ -71,7 +71,7 @@ def train(order, model, memory):
         for step, batch in enumerate(tqdm(train_dataloader)):
 
             # Perform sparse experience replay after every REPLAY_FREQ steps
-            if step % REPLAY_FREQ == 0:
+            if (step+1) % REPLAY_FREQ == 0:
                 # sample 100 examples from memory
                 content, attn_masks, labels = memory.sample(sample_size=100)
             else:
