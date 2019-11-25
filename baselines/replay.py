@@ -22,8 +22,8 @@ class ReplayMemory(object):
         """
 
         _batch = []
-
-        for content, attn_mask, label in zip(*examples):
+        contents, attn_masks, labels = examples
+        for content, attn_mask, label in zip(contents, attn_masks, labels):
             _batch.append(
                 (content.numpy(), attn_mask.numpy(), label.numpy()))
 
