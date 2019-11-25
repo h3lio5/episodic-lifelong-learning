@@ -9,6 +9,7 @@ import time
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 use_cuda = True if torch.cuda.is_available() else False
 # Use cudnn backends instead of vanilla backends when the input sizes
 # are similar so as to enable cudnn which will try to find optimal set
@@ -117,15 +118,29 @@ def train(order, model, memory):
         print("Train loss: {}".format(tr_loss/nb_tr_steps))
         print("Time taken till now: {} hours".format((now-start)/3600))
         model_dict = model.save_state()
-        torch.save(model_dict, '../model_checkpoints/' +
-                   MODEL_NAME+'/classifier_order_'+str(order)+'_epoch_'+str(epoch+1)+'.pth')
-        np.save('../model_checkpoints/' + MODEL_NAME + '/epoch_' + str(epoch+1),
-                np.asarray(memory.memory))
+        save_checkpoint(model_dict, order, epoch+1, memory=memory.memory)
+
     save_trainloss(train_loss_set)
 
 
-# Function to calculate the accuracy of our predictions vs labels
+def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_checkpoints/'):
+    """
+    Function to save a model checkpoint to the specified location
+    """
+    checkpoints_dir = base_loc + MODEL_NAME
+    if not os.path.exists(checkpoints_dir):
+        os.mkdir(checkpoints_dir)
+    checkpoints_file = 'classifier_order_' + \
+        str(order) + '_epoch_'+str(epoch)+'.pth'
+    torch.save(model_dict, os.path.join(checkpoints_dir, checkpoints_file))
+    if memory is not None:
+        np.save(checkpoints_dir+'/epoch_'+str(epoch), np.asarray(memory))
+
+
 def flat_accuracy(preds, labels):
+    """
+    Function to calculate the accuracy of our predictions vs labels
+    """
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
     return np.sum(pred_flat == labels_flat) / len(labels_flat)
