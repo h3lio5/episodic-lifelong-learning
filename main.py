@@ -189,7 +189,9 @@ def test(order, model):
 
 
 def save_trainloss(train_loss_set):
-
+    """
+    Function to save the image of training loss v/s iterations graph
+    """
     plt.figure(figsize=(15, 8))
     plt.title("Training loss")
     plt.xlabel("Batch")
