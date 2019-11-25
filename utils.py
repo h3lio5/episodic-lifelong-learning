@@ -4,6 +4,7 @@ import re
 import pickle
 import swifter
 import time
+import argparse
 
 TC_NUM_CLASSES = {
     'yelp': 5,
@@ -39,6 +40,11 @@ INDIVIDUAL_CLASS_LABELS = {
     'amazon': {1: '1', 2: '2', 3: '3', 4: '4', 5: '5'},
     'agnews': {1: 'World', 2: 'Sports', 3: 'Business', 4: 'Sci/Tech'}
 }
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--split', default='train',
+                    help='Enter the split: train/test')
+args = parser.parse_args()
 
 
 def preprocess(text):
@@ -170,6 +176,10 @@ def create_ordered_tc_data(order, base_location='../data/original_data', save_lo
             num_classes += TC_NUM_CLASSES[data]
 
     ordered_dataframe = pd.DataFrame(ordered_dataset)
+    # Shuffle the rows of the dataframe since the dataframe created has similar data grouped
+    if split == 'test':
+        ordered_dataframe.sample(frac=1).reset_index(drop=True, inplace=True)
+
     ordered_dataframe.to_csv(save_location+'/'+split +
                              '/'+str(order)+'.csv', index=False)
     with open(save_location+'/'+split+'/'+str(order)+'.pkl', 'wb') as f:
@@ -180,10 +190,14 @@ if __name__ == "__main__":
 
     # create ordered dataset
     total_time = 0
-    for i in range(4):
+    if args.split == 'test':
+        order = 1
+    else:
+        order = 4
+    for i in range(order):
         print("Started for order {}".format(i+1))
         start = time.time()
-        create_ordered_tc_data(i+1, split='train')
+        create_ordered_tc_data(i+1, split=args.split)
         end = time.time()
         print("Time taken for order {} : {} minutes".format(i+1, (end-start)/60))
         total_time += (end-start)/60
