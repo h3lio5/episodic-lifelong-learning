@@ -111,7 +111,8 @@ def test(order, model):
     """
     evaluate the model for accuracy
     """
-
+    # time at the start of validation
+    start = time.time()
     if use_cuda:
         model.cuda()
 
@@ -143,7 +144,8 @@ def test(order, model):
         tmp_correct = flat_accuracy(logits, labels)
         total_correct += tmp_correct
         t_steps += 1
-
+    end = time.time()
+    print("Time taken for validation {} minutes".format((end-start)/60))
     print("Validation Accuracy: {}".format(total_correct/t_steps))
 
 
