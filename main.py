@@ -6,6 +6,7 @@ from baselines.replay import ReplayMemory, ReplayModel
 import transformers
 from tqdm import trange, tqdm
 import time
+import copy
 import matplotlib.pyplot as plt
 import numpy as np
 use_cuda = True if torch.cuda.is_available() else False
@@ -69,16 +70,20 @@ def train(order, model, memory):
         nb_tr_examples, nb_tr_steps = 0, 0
         # Train the data for one epoch
         for step, batch in enumerate(tqdm(train_dataloader)):
-
+            # Release file descriptors which function as shared
+            # memory handles otherwise it will hit the limit when
+            # there are too many batches at dataloader
+            batch_cp = copy.deepcopy(batch)
+            del batch
             # Push the examples into the replay memory
-            memory.push(batch)
+            memory.push(batch_cp)
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if (step+1) % REPLAY_FREQ == 0:
                 # sample 100 examples from memory
                 content, attn_masks, labels = memory.sample(sample_size=64)
             else:
                 # Unpacking the batch items
-                content, attn_masks, labels = batch
+                content, attn_masks, labels = batch_cp
                 content = content.squeeze(1)
                 attn_masks = attn_masks.squeeze(1)
                 labels = labels.squeeze(1)
