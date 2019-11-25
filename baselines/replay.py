@@ -43,12 +43,12 @@ class ReplayMemory(object):
         labels = []
 
         samples = random.sample(self.memory, sample_size)
-        print("samples ", (len(samples)))
+
         for content, attn_mask, label in samples:
             contents.append(content)
             attn_masks.append(attn_mask)
             labels.append(label)
-        print("content ", len(contents), " type ", type(contents))
+
         print(contents)
         return (torch.LongTensor(np.asarray(contents)), torch.LongTensor(np.asarray(attn_masks)), torch.LongTensor(np.array(labels)))
 

@@ -24,7 +24,7 @@ LEARNING_RATE = 3e-5
 MODEL_NAME = 'REPLAY'
 # replay frequency = 1% of total number of steps per epoch
 # i.e., REPLAY_FREQ = 1/100(total_examples/batch_size) = 1/100(575000/32) ~ 180
-REPLAY_FREQ = 5
+REPLAY_FREQ = 180
 
 
 def train(order, model, memory):
@@ -75,7 +75,7 @@ def train(order, model, memory):
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if (step+1) % REPLAY_FREQ == 0:
                 # sample 100 examples from memory
-                content, attn_masks, labels = memory.sample(sample_size=10)
+                content, attn_masks, labels = memory.sample(sample_size=100)
             else:
                 # Unpacking the batch items
                 content, attn_masks, labels = batch
