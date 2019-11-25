@@ -2,6 +2,7 @@ import torch
 import random
 import transformers
 import torch.nn as nn
+import numpy as np
 
 
 class ReplayMemory(object):
