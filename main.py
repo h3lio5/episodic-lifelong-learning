@@ -2,7 +2,7 @@ import torch
 import torch.utils.data as data
 from data_loader import DataSet
 import argparse
-from baselines.enc_dec import EncDec
+from baselines.replay import ReplayMemory, ReplayModel
 import transformers
 from tqdm import trange
 import time
@@ -21,10 +21,13 @@ parser.add_argument('--epochs', default=4, type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
-MODEL_NAME = 'enc_dec'
+MODEL_NAME = 'REPLAY'
+# replay frequency = 1% of total number of steps per epoch
+# i.e., REPLAY_FREQ = 1/100(total_examples/batch_size) = 1/100(575000/32) ~ 180
+REPLAY_FREQ = 180
 
 
-def train(order, model):
+def train(order, model, memory):
     """
     """
     workers = 0
@@ -58,7 +61,7 @@ def train(order, model):
     # trange is a tqdm wrapper around the normal python range
     for epoch in trange(args.epochs, desc="Epoch"):
          # Training begins
-
+        print("Training begins")
         # Set our model to training mode (as opposed to evaluation mode)
         model.classifier.train()
         # Tracking variables
@@ -66,8 +69,17 @@ def train(order, model):
         nb_tr_examples, nb_tr_steps = 0, 0
         # Train the data for one epoch
         for step, batch in enumerate(train_dataloader):
-            # Unpacking the batch items
-            content, attn_masks, labels = batch
+
+            # Perform sparse experience replay after every REPLAY_FREQ steps
+            if step % REPLAY_FREQ == 0:
+                # sample 100 examples from memory
+                content, attn_masks, labels = memory.sample(sample_size=100)
+            else:
+                # Unpacking the batch items
+                content, attn_masks, labels = batch
+
+            # Push the examples into the replay memory
+            memory.push(batch)
             print("Epoch ", epoch+1, "step ", step+1)
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
@@ -96,11 +108,12 @@ def train(order, model):
         model_dict = model.save_state()
         torch.save(model_dict, '../model_checkpoints/' +
                    MODEL_NAME+'/classifier_order_'+str(order)+'_epoch_'+str(epoch+1)+'.pth')
+        np.save('../model_checkpoints/' + MODEL_NAME + '/epoch_' + str(epoch+1),
+                np.asarray(memory.memory))
     save_trainloss(train_loss_set)
 
+
 # Function to calculate the accuracy of our predictions vs labels
-
-
 def flat_accuracy(preds, labels):
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
@@ -162,8 +175,9 @@ def save_trainloss(train_loss_set):
 if __name__ == '__main__':
 
     if args.mode == 'train':
-        model = EncDec()
-        train(args.order, model)
+        model = ReplayModel()
+        memory = ReplayMemory()
+        train(args.order, model, memory)
 
     if args.mode == 'test':
         model_state = torch.load(
