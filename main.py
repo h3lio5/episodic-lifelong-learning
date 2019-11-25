@@ -70,6 +70,8 @@ def train(order, model, memory):
         # Train the data for one epoch
         for step, batch in enumerate(tqdm(train_dataloader)):
 
+            # Push the examples into the replay memory
+            memory.push(batch)
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if (step+1) % REPLAY_FREQ == 0:
                 # sample 100 examples from memory
@@ -80,9 +82,6 @@ def train(order, model, memory):
                 content = content.squeeze(1)
                 attn_masks = attn_masks.squeeze(1)
                 labels = labels.squeeze(1)
-
-            # Push the examples into the replay memory
-            memory.push(batch)
 
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
