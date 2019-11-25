@@ -83,7 +83,7 @@ def train(order, model, memory):
 
             # Push the examples into the replay memory
             memory.push(batch)
-            print("Epoch ", epoch+1, "step ", step+1)
+
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
                 content = content.cuda()
