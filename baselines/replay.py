@@ -3,32 +3,16 @@ import random
 import transformers
 
 
-class Replay(object):
+class ReplayMemory(object):
     """
     Stores the examples for sparse experience replay
     """
 
     def __init__(self):
         """
-        Initialize the replay buffer
+        Create the empty memory buffer
         """
         self.memory = []
-        # Initialize the pretrained bert model for sequence classification
-        self.classifier = transformers.BertForSequenceClassification.from_pretrained(
-            'bert-base-uncased', num_labels=33)
-
-    def classify(self, content, attn_masks, labels):
-
-        self.classifier.train()
-        loss, logits = self.classifier(
-            content, attention_mask=attn_masks, labels=labels)
-        return loss, logits
-
-    def infer(self, content, attn_masks):
-
-        self.classifier.eval()
-        logits = self.classifier(content, attention_mask=attn_masks)
-        return logits
 
     def push(self, examples):
         """
@@ -39,9 +23,9 @@ class Replay(object):
 
         for content, attn_mask, label in zip(examples):
             _batch.append(
-                (content.cpu().numpy(), attn_mask.cpu().numpy(), label.cpu().numpy()))
+                (content.numpy(), attn_mask.numpy(), label.numpy()))
 
-        self.memory.extend(batch)
+        self.memory.extend(_batch)
 
     def sample(self, sample_size=100):
         """
@@ -63,3 +47,52 @@ class Replay(object):
             labels.append(label)
 
         return (torch.LongTensor([contents]), torch.LongTensor([attn_masks]), torch.LongTensor([labels]))
+
+
+class ReplayModel(object):
+    """
+    Stores the examples for sparse experience replay
+    """
+
+    def __init__(self, mode='train', model_state=None):
+        """
+        Initialize the replay model
+        """
+        # Initialize the pretrained bert model for sequence classification
+        if mode == 'train':
+            # from_pretrained() loads weights, config from the files
+            # pytorch_model.bin and config.json if available in the directory provided
+            self.classifier = transformers.BertForSequenceClassification.from_pretrained(
+                '../pretrained_bert_tc/model_config')
+            # If weigths and config not saved locally then initialize the model using -
+            # self.classifier = transformers.BertForSequenceClassification.from_pretrained(
+            #    'bert-base-uncased', num_labels=33)
+
+        elif mode == 'test':
+            # If config file not locally available, then
+            # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
+            config = transformers.BertConfig.from_pretrained(
+                '../pretrained_bert_tc/model_config/config.json', num_labels=33)
+            self.classifier = transformers.BertForSequenceClassification(
+                config)
+            self.classifier.load_state_dict(model_state['classifier'])
+
+    def classify(self, content, attn_masks, labels):
+
+        self.classifier.train()
+        loss, logits = self.classifier(
+            content, attention_mask=attn_masks, labels=labels)
+        return loss, logits
+
+    def infer(self, content, attn_masks):
+
+        self.classifier.eval()
+        logits = self.classifier(content, attention_mask=attn_masks)
+        return logits
+
+    def save_state(self):
+
+        model_state = dict()
+        model_state['classifier'] = self.classifier.state_dict()
+
+        return model_state
