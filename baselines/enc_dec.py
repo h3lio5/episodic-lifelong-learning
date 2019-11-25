@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 
 
-class EncDec(nn.Module):
+class EncDec(object):
     """
     """
 
