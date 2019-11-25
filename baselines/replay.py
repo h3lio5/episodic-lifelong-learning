@@ -49,7 +49,6 @@ class ReplayMemory(object):
             attn_masks.append(attn_mask)
             labels.append(label)
 
-        print(contents)
         return (torch.LongTensor(np.asarray(contents)), torch.LongTensor(np.asarray(attn_masks)), torch.LongTensor(np.array(labels)))
 
 
