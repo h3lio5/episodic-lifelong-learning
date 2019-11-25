@@ -1,6 +1,7 @@
 import torch
 import random
 import transformers
+import torch.nn as nn
 
 
 class ReplayMemory(object):
@@ -12,6 +13,7 @@ class ReplayMemory(object):
         """
         Create the empty memory buffer
         """
+        super(ReplayModel, self).__init__()
         self.memory = []
 
     def push(self, examples):
@@ -49,7 +51,7 @@ class ReplayMemory(object):
         return (torch.LongTensor([contents]), torch.LongTensor([attn_masks]), torch.LongTensor([labels]))
 
 
-class ReplayModel(object):
+class ReplayModel(nn.Module):
     """
     Stores the examples for sparse experience replay
     """
