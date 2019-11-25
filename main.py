@@ -4,7 +4,7 @@ from data_loader import DataSet
 import argparse
 from baselines.replay import ReplayMemory, ReplayModel
 import transformers
-from tqdm import trange
+from tqdm import trange, tqdm
 import time
 import matplotlib.pyplot as plt
 import numpy as np
@@ -68,7 +68,7 @@ def train(order, model, memory):
         tr_loss = 0
         nb_tr_examples, nb_tr_steps = 0, 0
         # Train the data for one epoch
-        for step, batch in enumerate(train_dataloader):
+        for step, batch in enumerate(tqdm(train_dataloader)):
 
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if step % REPLAY_FREQ == 0:
