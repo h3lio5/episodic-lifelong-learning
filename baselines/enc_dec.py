@@ -26,7 +26,7 @@ class EncDec(nn.Module):
                 '../pretrained_bert_tc/model_config/config.json', num_labels=33)
             self.classifier = transformers.BertForSequenceClassification(
                 config)
-            self.classifier.load_state_dict(model_state)
+            self.classifier.load_state_dict(model_state['classifier'])
 
     def classify(self, content, attn_masks, labels):
 
