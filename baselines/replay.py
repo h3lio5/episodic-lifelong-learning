@@ -13,7 +13,7 @@ class ReplayMemory(object):
         """
         Create the empty memory buffer
         """
-        super(ReplayModel, self).__init__()
+
         self.memory = []
 
     def push(self, examples):
@@ -60,6 +60,7 @@ class ReplayModel(nn.Module):
         """
         Initialize the replay model
         """
+        super(ReplayModel, self).__init__()
         # Initialize the pretrained bert model for sequence classification
         if mode == 'train':
             # from_pretrained() loads weights, config from the files
