@@ -2,7 +2,7 @@ import torch
 import torch.utils.data as data
 from data_loader import DataSet
 import argparse
-from baselines.replay import ReplayMemory, ReplayModel
+from baselines.MbPA import ReplayMemory, MbPA
 import transformers
 from tqdm import trange, tqdm
 import time
@@ -28,12 +28,7 @@ parser.add_argument('--epochs', default=4, type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
-MODEL_NAME = 'REPLAY'
-# Due to memory restraint, we sample only 64 examples from
-# stored memory after every 6400(1% replay rate) new examples seen
-# as opposed to 100 suggested in the paper. The sampling is done after
-# performing 200 steps(6400/32).
-REPLAY_FREQ = 201
+MODEL_NAME = 'MbPA'
 
 
 def train(order, model, memory):
@@ -75,7 +70,7 @@ def train(order, model, memory):
         model.classifier.train()
         # Tracking variables
         tr_loss = 0
-        nb_tr_examples, nb_tr_steps = 0, 0
+        nb_tr_examples, nb_tr_steps, num_curr_exs = 0, 0, 0
         # Train the data for one epoch
         for step, batch in enumerate(tqdm(train_dataloader)):
             # Release file descriptors which function as shared
@@ -83,42 +78,13 @@ def train(order, model, memory):
             # there are too many batches at dataloader
             batch_cp = copy.deepcopy(batch)
             del batch
-            # Push the examples into the replay memory
-            memory.push(batch_cp)
-            # Perform sparse experience replay after every REPLAY_FREQ steps
-            if (step+1) % REPLAY_FREQ == 0:
-                # sample 64 examples from memory
-                content, attn_masks, labels = memory.sample(sample_size=64)
-                if use_cuda:
-                    content = content.cuda()
-                    attn_masks = attn_masks.cuda()
-                    labels = labels.cuda()
-                 # Clear out the gradients (by default they accumulate)
-                optimizer.zero_grad()
-                # Forward pass
-                loss, logits = model.classify(content, attn_masks, labels)
-                train_loss_set.append(loss.item())
-                # Backward pass
-                loss.backward()
-                # Update parameters and take a step using the computed gradient
-                optimizer.step()
-
-                # Update tracking variables
-                tr_loss += loss.item()
-                nb_tr_examples += content.size(0)
-                nb_tr_steps += 1
-
-                del content
-                del attn_masks
-                del labels
-                del loss
-
             # Unpacking the batch items
             content, attn_masks, labels = batch_cp
             content = content.squeeze(1)
             attn_masks = attn_masks.squeeze(1)
             labels = labels.squeeze(1)
-
+            # number of examples in the current batch
+            num_curr_exs = content.size(0)
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
                 content = content.cuda()
@@ -129,7 +95,13 @@ def train(order, model, memory):
             # Forward pass
             loss, logits = model.classify(content, attn_masks, labels)
             train_loss_set.append(loss.item())
+            # Get the key representation of documents
+            keys = model.get_keys(content, attn_masks)
+            # Push the examples into the replay memory
+            memory.push(keys.cpu().numpy(), (content.cpu().numpy(),
+                                             attn_masks.cpu().numpy(), labels.cpu().numpy()))
             # delete the batch data to freeup gpu memory
+            del keys
             del content
             del attn_masks
             del labels
@@ -137,10 +109,9 @@ def train(order, model, memory):
             loss.backward()
             # Update parameters and take a step using the computed gradient
             optimizer.step()
-
             # Update tracking variables
             tr_loss += loss.item()
-            nb_tr_examples += content.size(0)
+            nb_tr_examples += num_curr_exs
             nb_tr_steps += 1
 
         now = time.time()
@@ -166,7 +137,7 @@ def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_ch
         np.save(checkpoints_dir+'/epoch_'+str(epoch), np.asarray(memory))
 
 
-def flat_accuracy(preds, labels):
+def calc_correct(preds, labels):
     """
     Function to calculate the accuracy of our predictions vs labels
     """
@@ -208,7 +179,7 @@ def test(order, model):
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
         labels = labels.squeeze(1).numpy()
-        tmp_correct = flat_accuracy(logits, labels)
+        tmp_correct = calc_correct(logits, labels)
         total_correct += tmp_correct
         t_steps += len(labels.flatten())
     end = time.time()
@@ -242,6 +213,6 @@ if __name__ == '__main__':
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/REPLAY/classifier_order_1_epoch_3.pth')
+            '../model_checkpoints/REPLAY/classifier_order_1_epoch_1.pth')
         model = ReplayModel(mode='test', model_state=model_state)
         test(args.order, model)
