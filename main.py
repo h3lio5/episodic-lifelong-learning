@@ -188,7 +188,7 @@ def test(order, model):
     print("Validation Accuracy: {}".format(total_correct/t_steps))
 
 
-def save_trainloss(train_loss_set):
+def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
     """
     Function to save the image of training loss v/s iterations graph
     """
@@ -197,7 +197,12 @@ def save_trainloss(train_loss_set):
     plt.xlabel("Batch")
     plt.ylabel("Loss")
     plt.plot(train_loss_set)
-    plt.savefig('../loss_images/'+MODEL_NAME+'/train_loss.png')
+    image_dir = base_loc + MODEL_NAME
+    if not os.path.exists(image_dir):
+        os.mkdir(image_dir)
+
+    plt.savefig(train_loss_set, image_dir+'/order_' +
+                str(order)+'_train_loss.png')
 
 
 if __name__ == '__main__':
