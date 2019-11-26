@@ -143,7 +143,7 @@ def flat_accuracy(preds, labels):
     """
     pred_flat = np.argmax(preds, axis=1).flatten()
     labels_flat = labels.flatten()
-    return np.sum(pred_flat == labels_flat) / len(labels_flat)
+    return np.sum(pred_flat == labels_flat)
 
 
 def test(order, model):
@@ -181,7 +181,7 @@ def test(order, model):
         labels = labels.squeeze(1).numpy()
         tmp_correct = flat_accuracy(logits, labels)
         total_correct += tmp_correct
-        t_steps += 1
+        t_steps += len(labels.flatten())
     end = time.time()
     print("Time taken for validation {} minutes".format((end-start)/60))
     print("Validation Accuracy: {}".format(total_correct/t_steps))
