@@ -120,7 +120,7 @@ def train(order, model, memory):
         model_dict = model.save_state()
         save_checkpoint(model_dict, order, epoch+1, memory=memory.memory)
 
-    save_trainloss(train_loss_set)
+    save_trainloss(train_loss_set, order)
 
 
 def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_checkpoints/'):
@@ -163,9 +163,8 @@ def test(order, model):
     total_correct, tmp_correct, t_steps = 0, 0, 0
 
     print("Validation step started...")
-    for step, batch in enumerate(test_dataloader):
+    for step, batch in enumerate(tqdm(test_dataloader)):
 
-        print("Step", step)
         content, attn_masks, labels = batch
 
         if use_cuda:
@@ -214,6 +213,6 @@ if __name__ == '__main__':
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/enc_dec/classifier_order_1_epoch_4.pth')
-        model = EncDec(mode='test', model_state=model_state)
+            '../model_checkpoints/REPLAY/classifier_order_1_epoch_3.pth')
+        model = ReplayModel(mode='test', model_state=model_state)
         test(args.order, model)
