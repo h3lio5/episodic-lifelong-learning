@@ -29,9 +29,11 @@ args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
 MODEL_NAME = 'REPLAY'
-# replay frequency = 1% of total number of steps per epoch
-# i.e., REPLAY_FREQ = 1/100(total_examples/batch_size) = 1/100(575000/32) ~ 180
-REPLAY_FREQ = 180
+# Due to memory restraint, we sample only 64 examples from
+# stored memory after every 6400(1% replay rate) new examples seen
+# as opposed to 100 suggested in the paper. The sampling is done after
+# performing 200 steps(6400/32).
+REPLAY_FREQ = 201
 
 
 def train(order, model, memory):
@@ -85,14 +87,37 @@ def train(order, model, memory):
             memory.push(batch_cp)
             # Perform sparse experience replay after every REPLAY_FREQ steps
             if (step+1) % REPLAY_FREQ == 0:
-                # sample 100 examples from memory
+                # sample 64 examples from memory
                 content, attn_masks, labels = memory.sample(sample_size=64)
-            else:
-                # Unpacking the batch items
-                content, attn_masks, labels = batch_cp
-                content = content.squeeze(1)
-                attn_masks = attn_masks.squeeze(1)
-                labels = labels.squeeze(1)
+                if use_cuda:
+                    content = content.cuda()
+                    attn_masks = attn_masks.cuda()
+                    labels = labels.cuda()
+                 # Clear out the gradients (by default they accumulate)
+                optimizer.zero_grad()
+                # Forward pass
+                loss, logits = model.classify(content, attn_masks, labels)
+                train_loss_set.append(loss.item())
+                # Backward pass
+                loss.backward()
+                # Update parameters and take a step using the computed gradient
+                optimizer.step()
+
+                # Update tracking variables
+                tr_loss += loss.item()
+                nb_tr_examples += content.size(0)
+                nb_tr_steps += 1
+
+                del content
+                del attn_masks
+                del labels
+                del loss
+
+            # Unpacking the batch items
+            content, attn_masks, labels = batch_cp
+            content = content.squeeze(1)
+            attn_masks = attn_masks.squeeze(1)
+            labels = labels.squeeze(1)
 
             # Place the batch items on the appropriate device: cuda if avaliable
             if use_cuda:
