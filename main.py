@@ -129,6 +129,10 @@ def train(order, model, memory):
             # Forward pass
             loss, logits = model.classify(content, attn_masks, labels)
             train_loss_set.append(loss.item())
+            # delete the batch data to freeup gpu memory
+            del content
+            del attn_masks
+            del labels
             # Backward pass
             loss.backward()
             # Update parameters and take a step using the computed gradient
