@@ -91,7 +91,7 @@ class ReplayModel(nn.Module):
     def infer(self, content, attn_masks):
 
         self.classifier.eval()
-        logits = self.classifier(content, attention_mask=attn_masks)
+        logits, = self.classifier(content, attention_mask=attn_masks)
         return logits
 
     def save_state(self):
