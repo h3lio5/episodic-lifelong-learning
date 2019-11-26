@@ -5,6 +5,26 @@ import numpy as np
 import random
 
 
+class ReplayMemory(object):
+    """
+        Create the empty memory buffer
+    """
+
+    def __init__(self):
+
+        self.memory = {}
+
+    def push(self, keys, examples):
+        """
+        Add the examples as key-value pairs to the memory dictionary with content,attention_mask,label tuple as value
+        and key determined by key network
+        """
+        contents, attn_masks, labels = examples
+        # update the memory dictionary
+        for i, key in enumerate(keys):
+            self.memory.update({key: (contents[i], attn_masks[i], labels[i])})
+
+
 class MbPA():
     """
     Implements Memory based Parameter Adaptation model
@@ -37,6 +57,20 @@ class MbPA():
         loss, logits = self.classifier(
             content, attention_mask=attention_mask, labels=labels)
         return loss, logits
+
+    def get_keys(self, contents, attn_masks):
+        """
+        Return key representation of the documents
+        """
+        # Freeze the weights of the key network to prevent key
+        # representations from drifting as data distribution changes
+        with torch.no_grad():
+            last_hidden_states, _ = self.key_enc(
+                contents, attention_mask=attn_masks)
+        # Obtain key representation of every text content by selecting the its [CLS] hidden representation
+        keys = last_hidden_states[:, 0, :]
+
+        return keys
 
     def infer(self, content_batch):
         """
@@ -114,7 +148,8 @@ class MbPA():
         if self.mode == 'nearest':
             all_keys = np.asarray(list(self.memory.keys()))
             similarity_scores = np.dot(all_keys, key.T)
-            K_neighbour_keys = all_keys[np.argpartition(similarity_scores, -k)[-k:]]
+            K_neighbour_keys = all_keys[np.argpartition(
+                similarity_scores, -k)[-k:]]
             return K_neighbour_keys
 
         elif self.mode == 'random':
