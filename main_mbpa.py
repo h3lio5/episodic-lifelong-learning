@@ -9,6 +9,7 @@ import time
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+import pickle
 import os
 use_cuda = True if torch.cuda.is_available() else False
 # Use cudnn backends instead of vanilla backends when the input sizes
@@ -134,7 +135,8 @@ def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_ch
         str(order) + '_epoch_'+str(epoch)+'.pth'
     torch.save(model_dict, os.path.join(checkpoints_dir, checkpoints_file))
     if memory is not None:
-        np.save(checkpoints_dir+'/epoch_'+str(epoch), np.asarray(memory))
+        with open(checkpoints_dir+'/order_'+str(order)+'_epoch_'+str(epoch)+'.pkl') as f:
+            pickle.dump(memory, f)
 
 
 def calc_correct(preds, labels):
