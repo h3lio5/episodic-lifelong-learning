@@ -7,10 +7,10 @@ class EncDec(nn.Module):
     """
     """
 
-    def __init__(self, mode='train', model_state=None):
+    def __init__(self, model_state=None):
         super(EncDec, self).__init__()
         # Initialize the pretrained bert model for sequence classification
-        if mode == 'train':
+        if model_state is None:
             # from_pretrained() loads weights, config from the files
             # pytorch_model.bin and config.json if available in the directory provided
             self.classifier = transformers.BertForSequenceClassification.from_pretrained(
@@ -19,7 +19,7 @@ class EncDec(nn.Module):
             # self.classifier = transformers.BertForSequenceClassification.from_pretrained(
             #    'bert-base-uncased', num_labels=33)
 
-        elif mode == 'test':
+        else:
             # If config file not locally available, then
             # config = transformers.BertConfig.from_pretrained('bert-base-uncased', num_labels=33)
             config = transformers.BertConfig.from_pretrained(
