@@ -24,7 +24,7 @@ parser.add_argument('--mode', default='train',
                     help='Enter the mode - train/eval')
 parser.add_argument('--order', default=1, type=int,
                     help='Enter the dataset order - 1/2/3/4')
-parser.add_argument('--epochs', default=4, type=int)
+parser.add_argument('--epochs', default=2, type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 
