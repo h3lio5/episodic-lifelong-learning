@@ -76,7 +76,7 @@ class MbPA(nn.Module):
     """
 
     def __init__(self, L=30, model_state=None):
-        super(MbPA).__init__(self)
+        super(MbPA), self.__init__()
 
         if model_state is None:
             # Key network to find key representation of content
