@@ -93,13 +93,13 @@ def train(order, model, memory):
             # Clear out the gradients (by default they accumulate)
             optimizer.zero_grad()
             # Forward pass
-            loss, logits = model.classify(content, attn_masks, labels)
+            loss, _ = model.classify(content, attn_masks, labels)
             train_loss_set.append(loss.item())
             # Get the key representation of documents
             keys = model.get_keys(content, attn_masks)
             # Push the examples into the replay memory
-            memory.push(keys.cpu().numpy(), (content.cpu().numpy(),
-                                             attn_masks.cpu().numpy(), labels.cpu().numpy()))
+            memory.push(keys.cpu(), (content.cpu(),
+                                     attn_masks.cpu(), labels.cpu()))
             # delete the batch data to freeup gpu memory
             del keys
             del content
@@ -219,12 +219,12 @@ def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
 if __name__ == '__main__':
 
     if args.mode == 'train':
-        model = ReplayModel()
+        model = MbPA()
         memory = ReplayMemory()
         train(args.order, model, memory)
 
     if args.mode == 'test':
         model_state = torch.load(
             '../model_checkpoints/REPLAY/classifier_order_1_epoch_1.pth')
-        model = MbPA(mode='test', model_state=model_state)
+        model = MbPA(model_state=model_state)
         test(args.order, model)
