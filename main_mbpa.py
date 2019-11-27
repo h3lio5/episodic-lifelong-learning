@@ -164,22 +164,34 @@ def test(order, model):
 
     print("Validation step started...")
     for step, batch in enumerate(tqdm(test_dataloader)):
-
-        content, attn_masks, labels = batch
-
+        batch_cp = copy.deepcopy(batch)
+        del batch
+        contents, attn_masks, labels = batch_cp
         if use_cuda:
-            content = content.cuda()
+            contents = contents.cuda()
             attn_masks = attn_masks.cuda()
-        # Telling the model not to compute or store gradients, saving memory and speeding up validation
-        with torch.no_grad():
-            # Forward pass, calculate logit predictions
-            logits = model.infer(content.squeeze(1), attn_masks.squeeze(1))
-
-        logits = logits.detach().cpu().numpy()
+        keys = model.get_keys(contents, attn_masks)
+        contents = contents.cpu()
+        attn_masks = attn_masks.cpu()
+        retrieved_batches = memory.get_neighbours(keys.cpu().numpy())
+        ans_logits = []
+        # Iterate over the test batch to calculate label for each document(i.e,content)
+        # and store them in a list for comparision later
+        for content, attn_mask, rt_batch in zip(contents, attn_masks, retrieved_batches):
+            if use_cuda:
+                content = content.cuda()
+                attn_mask = attn_mask.cuda()
+                rt_batch = rt_batch.cuda()
+            logits = model.infer(content, attn_mask, rt_batch)
+            # After performing inference delete the batch data to free gpu memory
+            del content
+            del attn_mask
+            del rt_batch
+            ans_logits.append(logits)
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
         labels = labels.squeeze(1).numpy()
-        tmp_correct = calc_correct(logits, labels)
+        tmp_correct = calc_correct(np.asarray(ans_logits), labels)
         total_correct += tmp_correct
         t_steps += len(labels.flatten())
     end = time.time()
@@ -214,5 +226,5 @@ if __name__ == '__main__':
     if args.mode == 'test':
         model_state = torch.load(
             '../model_checkpoints/REPLAY/classifier_order_1_epoch_1.pth')
-        model = ReplayModel(mode='test', model_state=model_state)
+        model = MbPA(mode='test', model_state=model_state)
         test(args.order, model)
