@@ -75,14 +75,30 @@ class MbPA(nn.Module):
     Implements Memory based Parameter Adaptation model
     """
 
-    def __init__(self, L=30, mode='train'):
+    def __init__(self, L=30, model_state=None):
         super(MbPA).__init__(self)
-        # Key network to find key representation of content
-        self.key_enc = transformers.BertModel.from_pretrained(
-            'bert-base-uncased')
-        # Bert model for text classification
-        self.classifier = transformers.BertForSequenceClassification.from_pretrained(
-            '../pretrained_bert_tc/model_config')
+
+        if model_state is None:
+            # Key network to find key representation of content
+            self.key_encoder = transformers.BertModel.from_pretrained(
+                '../pretrained_bert_tc/key_encoder')
+            # Bert model for text classification
+            self.classifier = transformers.BertForSequenceClassification.from_pretrained(
+                '../pretrained_bert_tc/classifier')
+
+        else:
+
+            cls_config = transformers.BertConfig.from_pretrained(
+                '../pretrained_bert_tc/classifier/config.json', num_labels=33)
+            self.classifier = transformers.BertForSequenceClassification(
+                cls_config)
+            self.classifier.load_state_dict(model_state['classifier'])
+            key_config = transformers.BertConfig.from_pretrained(
+                '../pretrained_bert_tc/key_encoder/config.json')
+            self.key_encoder = transformers.BertModel.from_pretrained(
+                key_config)
+            self.key_encoder.load_state_dict(model_state['key_encoder'])
+
         # Number of local adaptation steps
         self.L = L
 
@@ -101,7 +117,7 @@ class MbPA(nn.Module):
         # Freeze the weights of the key network to prevent key
         # representations from drifting as data distribution changes
         with torch.no_grad():
-            last_hidden_states, _ = self.key_enc(
+            last_hidden_states, _ = self.key_encoder(
                 contents, attention_mask=attn_masks)
         # Obtain key representation of every text content by selecting the its [CLS] hidden representation
         keys = last_hidden_states[:, 0, :]
@@ -158,3 +174,13 @@ class MbPA(nn.Module):
         del attn_mask
 
         return logits
+
+    def save_state(self):
+        """
+        Returns model state 
+        """
+        model_state = dict()
+        model_state['classifier'] = self.classifier.state_dict()
+        model_state['key_encoder'] = self.key_encoder.state_dict()
+
+        return model_state
