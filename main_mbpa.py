@@ -227,6 +227,6 @@ if __name__ == '__main__':
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/REPLAY/classifier_order_1_epoch_1.pth')
+            '../model_checkpoints/MbPA/classifier_order_1_epoch_1.pth')
         model = MbPA(model_state=model_state)
         test(args.order, model)
