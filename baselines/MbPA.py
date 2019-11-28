@@ -95,8 +95,7 @@ class MbPA(nn.Module):
             self.classifier.load_state_dict(model_state['classifier'])
             key_config = transformers.BertConfig.from_pretrained(
                 '../pretrained_bert_tc/key_encoder/config.json')
-            self.key_encoder = transformers.BertModel.from_pretrained(
-                key_config)
+            self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
 
         # Number of local adaptation steps
