@@ -135,7 +135,7 @@ def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_ch
         str(order) + '_epoch_'+str(epoch)+'.pth'
     torch.save(model_dict, os.path.join(checkpoints_dir, checkpoints_file))
     if memory is not None:
-        with open(checkpoints_dir+'/order_'+str(order)+'_epoch_'+str(epoch)+'.pkl') as f:
+        with open(checkpoints_dir+'/order_'+str(order)+'_epoch_'+str(epoch)+'.pkl', 'wb') as f:
             pickle.dump(memory, f)
 
 
@@ -170,8 +170,8 @@ def test(order, model):
         del batch
         contents, attn_masks, labels = batch_cp
         if use_cuda:
-            contents = contents.cuda()
-            attn_masks = attn_masks.cuda()
+            contents = contents.squeeze(1).cuda()
+            attn_masks = attn_masks.squeeze(1).cuda()
         keys = model.get_keys(contents, attn_masks)
         contents = contents.cpu()
         attn_masks = attn_masks.cpu()
