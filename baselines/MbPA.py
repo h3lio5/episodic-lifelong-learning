@@ -12,9 +12,12 @@ class ReplayMemory(object):
         Create the empty memory buffer
     """
 
-    def __init__(self):
+    def __init__(self, buffer=None):
 
-        self.memory = {}
+        if buffer is None:
+            self.memory = {}
+        else:
+            self.memory = buffer
 
     def push(self, keys, examples):
         """
