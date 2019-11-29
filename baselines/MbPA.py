@@ -28,7 +28,7 @@ class ReplayMemory(object):
         # update the memory dictionary
         for i, key in enumerate(keys):
             self.memory.update(
-                {key: (contents[i].numpy(), attn_masks[i].numpy(), labels[i].numpy())})
+                {key.numpy(): (contents[i].numpy(), attn_masks[i].numpy(), labels[i].numpy())})
 
     def _prepare_batch(self, sample):
         """
