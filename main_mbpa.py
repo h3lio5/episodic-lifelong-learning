@@ -77,6 +77,8 @@ def train(order, model, memory):
             # Release file descriptors which function as shared
             # memory handles otherwise it will hit the limit when
             # there are too many batches at dataloader
+            if (step+1) % 50 == 0:
+                break
             batch_cp = copy.deepcopy(batch)
             del batch
             # Unpacking the batch items
