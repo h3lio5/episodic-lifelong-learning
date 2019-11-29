@@ -27,8 +27,9 @@ class ReplayMemory(object):
         contents, attn_masks, labels = examples
         # update the memory dictionary
         for i, key in enumerate(keys):
+            # numpy array cannot be used as key since it is non-hashable, hence convert it to bytes to use as key
             self.memory.update(
-                {key.numpy(): (contents[i].numpy(), attn_masks[i].numpy(), labels[i].numpy())})
+                {key.tobytes(): (contents[i], attn_masks[i], labels[i])})
 
     def _prepare_batch(self, sample):
         """
@@ -179,7 +180,7 @@ class MbPA(nn.Module):
 
     def save_state(self):
         """
-        Returns model state 
+        Returns model state
         """
         model_state = dict()
         model_state['classifier'] = self.classifier.state_dict()
