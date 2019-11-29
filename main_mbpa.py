@@ -77,8 +77,6 @@ def train(order, model, memory):
             # Release file descriptors which function as shared
             # memory handles otherwise it will hit the limit when
             # there are too many batches at dataloader
-            if (step+1) % 50 == 0:
-                break
             batch_cp = copy.deepcopy(batch)
             del batch
             # Unpacking the batch items
@@ -133,11 +131,11 @@ def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_ch
     checkpoints_dir = base_loc + MODEL_NAME
     if not os.path.exists(checkpoints_dir):
         os.mkdir(checkpoints_dir)
-    checkpoints_file = 'test_classifier_order_' + \
+    checkpoints_file = 'classifier_order_' + \
         str(order) + '_epoch_'+str(epoch)+'.pth'
     torch.save(model_dict, os.path.join(checkpoints_dir, checkpoints_file))
     if memory is not None:
-        with open(checkpoints_dir+'/test_order_'+str(order)+'_epoch_'+str(epoch)+'.pkl', 'wb') as f:
+        with open(checkpoints_dir+'/order_'+str(order)+'_epoch_'+str(epoch)+'.pkl', 'wb') as f:
             pickle.dump(memory, f)
 
 
