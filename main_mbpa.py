@@ -148,7 +148,7 @@ def calc_correct(preds, labels):
     return np.sum(pred_flat == labels_flat)
 
 
-def test(order, model):
+def test(order, model, memory):
     """
     evaluate the model for accuracy
     """
@@ -233,4 +233,4 @@ if __name__ == '__main__':
         with open('../model_checkpoints/MBPA/order_1_epoch_1.pkl', 'rb') as f:
             buffer = pickle.load(f)
         memory = ReplayMemory(buffer=buffer)
-        test(args.order, model)
+        test(args.order, model, memory)
