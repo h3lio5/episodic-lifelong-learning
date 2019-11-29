@@ -46,11 +46,11 @@ class ReplayMemory(object):
         # Iterate over experiences
         for content, attn_mask, label in sample:
             # convert the batch elements into torch.LongTensor
-            contents.append(torch.LongTensor(content))
-            attn_masks.append(torch.LongTensor(attn_mask))
-            labels.append(torch.LongTensor(label))
+            contents.append(content)
+            attn_masks.append(attn_mask)
+            labels.append(label)
 
-        return (contents, attn_masks, labels)
+        return (torch.LongTensor(contents), torch.LongTensor(attn_masks), torch.LongTensor(labels))
 
     def get_neighbours(self, keys, k=32):
         """
