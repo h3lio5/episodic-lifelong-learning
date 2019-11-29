@@ -101,8 +101,8 @@ def train(order, model, memory):
             # Get the key representation of documents
             keys = model.get_keys(content, attn_masks)
             # Push the examples into the replay memory
-            memory.push(keys.cpu(), (content.cpu(),
-                                     attn_masks.cpu(), labels.cpu()))
+            memory.push(keys.cpu().numpy(), (content.cpu().numpy(),
+                                             attn_masks.cpu().numpy(), labels.cpu().numpy()))
             # delete the batch data to freeup gpu memory
             del keys
             del content
