@@ -68,7 +68,7 @@ class ReplayMemory(object):
             similarity_scores = np.dot(self.all_keys, key.T)
             K_neighbour_keys = self.all_keys[np.argpartition(
                 similarity_scores, -k)[-k:]]
-            neighbours = [self.memory[nkey]
+            neighbours = [self.memory[nkey.tobytes()]
                           for nkey in K_neighbour_keys]
             # converts experiences into batch
             batch = self._prepare_batch(neighbours)
