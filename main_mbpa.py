@@ -175,6 +175,7 @@ def test(order, model, memory):
         keys = model.get_keys(contents, attn_masks)
         contents = contents.cpu()
         attn_masks = attn_masks.cpu()
+        print("keys shape", keys.shape)
         retrieved_batches = memory.get_neighbours(keys.cpu().numpy())
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
