@@ -183,8 +183,12 @@ def test(order, model, memory):
             if use_cuda:
                 content = content.cuda()
                 attn_mask = attn_mask.cuda()
-                rt_batch = rt_batch.cuda()
-            logits = model.infer(content, attn_mask, rt_batch)
+                rt_contents = rt_batch[0].cuda()
+                rt_attn_masks = rt_batch[1].cuda()
+                rt_labels = rt_batch[2].cuda()
+
+            logits = model.infer(content, attn_mask,
+                                 (rt_contents, rt_attn_masks, rt_labels))
             # After performing inference delete the batch data to free gpu memory
             del content
             del attn_mask
