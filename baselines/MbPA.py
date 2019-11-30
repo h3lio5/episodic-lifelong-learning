@@ -20,7 +20,8 @@ class ReplayMemory(object):
             self.memory = buffer
             print("buffer ", type(buffer.keys()), len(buffer.keys()))
             # convert the keys from np.bytes to np.float64
-            self.all_keys = np.frombuffer(np.asarray(self.memory.keys()))
+            self.all_keys = np.frombuffer(
+                np.asarray(tuple(self.memory.keys())))
             print("all_keys ", self.all_keys.shape)
 
     def push(self, keys, examples):
