@@ -18,7 +18,8 @@ class ReplayMemory(object):
             self.memory = {}
         else:
             self.memory = buffer
-            print("buffer ", type(buffer.keys()), len(buffer.keys()))
+            print("buffer ", type(tuple(buffer.keys())),
+                  len(tuple(buffer.keys())))
             # convert the keys from np.bytes to np.float64
             self.all_keys = np.frombuffer(
                 np.asarray(tuple(self.memory.keys())))
