@@ -18,6 +18,8 @@ class ReplayMemory(object):
             self.memory = {}
         else:
             self.memory = buffer
+            # convert the keys from np.bytes to np.float64
+            self.all_keys = np.frombuffer(np.asarray(self.memory.keys()))
 
     def push(self, keys, examples):
         """
@@ -57,13 +59,12 @@ class ReplayMemory(object):
         Returns samples from buffer using nearest neighbour approach
         """
         samples = []
-        all_keys = np.asarray(list(self.memory.keys()))
         # Iterate over all the input keys
         # to find neigbours for each of them
         for key in keys:
             # compute similarity scores based on Euclidean distance metric
-            similarity_scores = np.dot(all_keys, key.T)
-            K_neighbour_keys = all_keys[np.argpartition(
+            similarity_scores = np.dot(self.all_keys, key.T)
+            K_neighbour_keys = self.all_keys[np.argpartition(
                 similarity_scores, -k)[-k:]]
             neighbours = [self.memory[nkey]
                           for nkey in K_neighbour_keys]
