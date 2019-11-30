@@ -18,12 +18,10 @@ class ReplayMemory(object):
             self.memory = {}
         else:
             self.memory = buffer
-            print("buffer ", type(list(buffer.keys())),
-                  np.asarray(list(buffer.keys())).shape)
-            # convert the keys from np.bytes to np.float64
+            total_keys = len(buffer.keys())
+            # convert the keys from np.bytes to np.float32
             self.all_keys = np.frombuffer(
-                np.asarray(list(self.memory.keys())))
-            print("all_keys ", self.all_keys.shape)
+                np.asarray(list(self.memory.keys())), dtype=np.float32).reshape(total_keys, 768)
 
     def push(self, keys, examples):
         """
