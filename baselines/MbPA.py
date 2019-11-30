@@ -19,7 +19,7 @@ class ReplayMemory(object):
         else:
             self.memory = buffer
             print("buffer ", type(list(buffer.keys())),
-                  len(list(buffer.keys())))
+                  list(buffer.keys()).shape)
             # convert the keys from np.bytes to np.float64
             self.all_keys = np.frombuffer(
                 np.asarray(list(self.memory.keys())))
