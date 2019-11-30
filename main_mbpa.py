@@ -227,10 +227,10 @@ if __name__ == '__main__':
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/MbPA/classifier_order_1_epoch_1.pth')
+            '../model_checkpoints/MbPA/classifier_order_1_epoch_2.pth')
         model = MbPA(model_state=model_state)
         buffer = {}
-        with open('../model_checkpoints/MbPA/order_1_epoch_1.pkl', 'rb') as f:
+        with open('../model_checkpoints/MbPA/order_1_epoch_2.pkl', 'rb') as f:
             buffer = pickle.load(f)
         memory = ReplayMemory(buffer=buffer)
         test(args.order, model, memory)
