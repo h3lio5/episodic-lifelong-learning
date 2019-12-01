@@ -104,8 +104,7 @@ class MbPA(nn.Module):
                 '../pretrained_bert_tc/key_encoder/config.json')
             self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
-            # base model weights
-            self.base_weights = self.classifier.parameters()
+
             # # Freeze the base model weights
             # for param in self.base_weights:
             #     param.requires_grad = False
@@ -151,6 +150,8 @@ class MbPA(nn.Module):
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
             adaptive_classifier.parameters(), lr=1e-3)
+        # base model weights
+        base_weights = self.classifier.parameters()
         # Current model weights
         curr_weights = adaptive_classifier.parameters()
         # Train the adaptive classifier for L epochs with the rt_batch
@@ -164,7 +165,7 @@ class MbPA(nn.Module):
             diff_loss, diff = 0, 0
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
             # of their differences
-            for base_param, curr_param in zip(self.base_weights, curr_weights):
+            for base_param, curr_param in zip(base_weights, curr_weights):
                 diff = (base_param-curr_param).pow(2).sum()
                 diff_loss += diff
             # Total loss due to log likelihood and weight restraint
@@ -175,14 +176,15 @@ class MbPA(nn.Module):
         del K_contents
         del K_attn_masks
         del K_labels
-
-        logits, = adaptive_classifier(content.unsqueeze(
-            0), attention_mask=attn_mask.unsqueeze(0))
-        del content
-        del attn_mask
         del curr_weights
         del adaptive_classifier
         del optimizer
+        del base_weights
+        logits, = adaptive_classifier(content.unsqueeze(
+            0), attention_mask=attn_mask.unsqueeze(0))
+
+        del content
+        del attn_mask
 
         return logits
 
