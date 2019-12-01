@@ -179,7 +179,7 @@ def test(order, model, memory):
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
         # and store them in a list for comparision later
-        for content, attn_mask, rt_contents, rt_attn_masks, rt_labels in zip(contents, attn_masks, retrieved_batches):
+        for content, attn_mask, (rt_contents, rt_attn_masks, rt_labels) in zip(contents, attn_masks, retrieved_batches):
             if use_cuda:
                 content = content.cuda()
                 attn_mask = attn_mask.cuda()
