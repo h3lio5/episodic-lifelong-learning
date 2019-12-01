@@ -151,10 +151,11 @@ class MbPA(nn.Module):
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
             adaptive_classifier.parameters(), lr=1e-3)
+        # unpack the contents,attn_masks,labels from retrived batch
+        K_contents, K_attn_masks, K_labels = rt_batch
         # Train the adaptive classifier for L epochs with the rt_batch
         for _ in trange(self.L, desc='Local Adaptation'):
-            # unpack the contents,attn_masks,labels from retrived batch
-            K_contents, K_attn_masks, K_labels = rt_batch
+
             # zero out the gradients
             optimizer.zero_grad()
             likelihood_loss, _ = adaptive_classifier(
