@@ -173,6 +173,9 @@ class MbPA(nn.Module):
             total_loss.backward()
             optimizer.step()
         # Delete the k neigbours after training to freeup memory
+        del total_loss
+        del diff_loss
+        del likelihood_loss
         del K_contents
         del K_attn_masks
         del K_labels
