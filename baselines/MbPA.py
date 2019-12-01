@@ -166,7 +166,7 @@ class MbPA(nn.Module):
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
-                diff = (base_param-curr_param).pow(2).sum()
+                diff = (base_param.data-curr_param).pow(2).sum()
                 diff_loss += diff
             # Total loss due to log likelihood and weight restraint
             total_loss = likelihood_loss + 0.001*sqrt(diff_loss)
