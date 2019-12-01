@@ -176,6 +176,7 @@ def test(order, model, memory):
         contents = contents.cpu()
         attn_masks = attn_masks.cpu()
         retrieved_batches = memory.get_neighbours(keys.cpu().numpy())
+        del keys
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
         # and store them in a list for comparision later
