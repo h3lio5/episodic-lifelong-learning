@@ -105,7 +105,7 @@ class MbPA(nn.Module):
             self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
             # base model weights
-            base_weights = self.classifier.parameters()
+            self.base_weights = self.classifier.parameters()
             # # Freeze the base model weights
             for param in self.base_weights:
                 param.requires_grad = False
