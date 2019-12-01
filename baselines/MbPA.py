@@ -161,7 +161,7 @@ class MbPA(nn.Module):
             likelihood_loss, _ = adaptive_classifier(
                 K_contents, attention_mask=K_attn_masks, labels=K_labels)
 
-            diff = torch.Tensor([0])
+            diff = torch.Tensor([0]).cuda()
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
