@@ -180,6 +180,8 @@ class MbPA(nn.Module):
             0), attention_mask=attn_mask.unsqueeze(0))
         del content
         del attn_mask
+        del curr_weights
+        del adaptive_classifier
 
         return logits
 
