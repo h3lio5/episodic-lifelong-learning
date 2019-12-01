@@ -106,8 +106,8 @@ class MbPA(nn.Module):
             # base model weights
             self.base_weights = list(self.classifier.parameters())
             # # Freeze the base model weights
-            # for param in self.base_weights:
-            #     param.requires_grad = False
+            for param in self.base_weights:
+                param.requires_grad = False
 
         # Number of local adaptation steps
         self.L = L
