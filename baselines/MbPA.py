@@ -175,6 +175,7 @@ class MbPA(nn.Module):
             optimizer.step()
         # Delete the rt_batch after training to freeup memory
         del rt_batch
+        print("Shapes ", content.shape, attn_mask.shape)
         logits, _ = adaptive_classifier(content, attention_mask=attn_mask)
         del content
         del attn_mask
