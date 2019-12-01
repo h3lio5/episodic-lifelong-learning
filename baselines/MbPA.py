@@ -182,6 +182,7 @@ class MbPA(nn.Module):
         del attn_mask
         del curr_weights
         del adaptive_classifier
+        del optimizer
 
         return logits
 
