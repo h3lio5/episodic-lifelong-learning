@@ -198,6 +198,7 @@ def test(order, model, memory):
         # shape : (batch_size,num_labels)
         labels = labels.squeeze(1).numpy()
         tmp_correct = calc_correct(np.asarray(ans_logits), labels)
+        del labels
         total_correct += tmp_correct
         t_steps += len(labels.flatten())
     end = time.time()
