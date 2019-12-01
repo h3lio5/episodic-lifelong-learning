@@ -190,6 +190,7 @@ def test(order, model, memory):
             logits = model.infer(content, attn_mask,
                                  (rt_contents, rt_attn_masks, rt_labels))
             # After performing inference delete the batch data to free gpu memory
+            print("deleting content,attn_mask,rt_batch")
             del content
             del attn_mask
             del rt_batch
