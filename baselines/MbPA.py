@@ -151,6 +151,8 @@ class MbPA(nn.Module):
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
             adaptive_classifier.parameters(), lr=1e-3)
+        # Current model weights
+        curr_weights = adaptive_classifier.parameters()
         # Train the adaptive classifier for L epochs with the rt_batch
         for _ in trange(self.L, desc='Local Adaptation'):
 
@@ -158,10 +160,7 @@ class MbPA(nn.Module):
             optimizer.zero_grad()
             likelihood_loss, _ = adaptive_classifier(
                 K_contents, attention_mask=K_attn_masks, labels=K_labels)
-            diff_loss = 0
             print("Log loss")
-            # Current model weights
-            curr_weights = adaptive_classifier.parameters()
 
             diff_loss, diff = 0, 0
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
