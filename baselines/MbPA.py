@@ -160,7 +160,6 @@ class MbPA(nn.Module):
             optimizer.zero_grad()
             likelihood_loss, _ = adaptive_classifier(
                 K_contents, attention_mask=K_attn_masks, labels=K_labels)
-            print("Log loss")
 
             diff_loss, diff = 0, 0
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
@@ -169,19 +168,16 @@ class MbPA(nn.Module):
                 diff = (base_param-curr_param).pow(2).sum()
                 diff_loss += diff
             # Total loss due to log likelihood and weight restraint
-            print("Diff loss")
             total_loss = likelihood_loss + 0.001*sqrt(diff_loss)
             total_loss.backward()
             optimizer.step()
         # Delete the k neigbours after training to freeup memory
-        print("Print k")
         del K_contents
         del K_attn_masks
         del K_labels
 
         logits, = adaptive_classifier(content.unsqueeze(
             0), attention_mask=attn_mask.unsqueeze(0))
-        print("logits")
         del content
         del attn_mask
 
