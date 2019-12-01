@@ -106,8 +106,8 @@ class MbPA(nn.Module):
             # base model weights
             self.base_weights = list(self.classifier.parameters())
             # # Freeze the base model weights
-            for param in self.base_weights:
-                param.requires_grad = False
+            # for param in self.base_weights:
+            #     param.requires_grad = False
 
         # Number of local adaptation steps
         self.L = L
@@ -166,6 +166,7 @@ class MbPA(nn.Module):
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
                 diff += (base_param.data-curr_param).pow(2).sum()
+                print(base_param.requires_grad)
             # Total loss due to log likelihood and weight restraint
             diff_loss = 0.001*diff.sqrt()
             print(type(diff_loss))
