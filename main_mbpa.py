@@ -179,13 +179,13 @@ def test(order, model, memory):
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
         # and store them in a list for comparision later
-        for content, attn_mask, rt_batch in zip(contents, attn_masks, retrieved_batches):
+        for content, attn_mask, rt_contents, rt_attn_masks, rt_labels in zip(contents, attn_masks, retrieved_batches):
             if use_cuda:
                 content = content.cuda()
                 attn_mask = attn_mask.cuda()
-                rt_contents = rt_batch[0].cuda()
-                rt_attn_masks = rt_batch[1].cuda()
-                rt_labels = rt_batch[2].cuda()
+                rt_contents = rt_contents.cuda()
+                rt_attn_masks = rt_attn_masks.cuda()
+                rt_labels = rt_labels.cuda()
 
             logits = model.infer(content, attn_mask,
                                  rt_contents, rt_attn_masks, rt_labels)
@@ -193,7 +193,9 @@ def test(order, model, memory):
             print("deleting content,attn_mask,rt_batch")
             del content
             del attn_mask
-            del rt_batch
+            del rt_contents
+            del rt_attn_masks
+            del rt_labels
             ans_logits.append(logits)
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
