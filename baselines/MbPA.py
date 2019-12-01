@@ -106,9 +106,9 @@ class MbPA(nn.Module):
             self.key_encoder.load_state_dict(model_state['key_encoder'])
             # base model weights
             self.base_weights = self.classifier.parameters()
-            # Freeze the base model weights
-            for param in self.base_weights:
-                param.requires_grad = False
+            # # Freeze the base model weights
+            # for param in self.base_weights:
+            #     param.requires_grad = False
 
         # Number of local adaptation steps
         self.L = L
