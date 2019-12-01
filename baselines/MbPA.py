@@ -4,7 +4,6 @@ import transformers
 import numpy as np
 from tqdm import trange
 import copy
-from math import sqrt
 
 
 class ReplayMemory(object):
@@ -167,10 +166,8 @@ class MbPA(nn.Module):
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
                 diff += (base_param.data-curr_param).pow(2).sum()
-                print("diff: ", type(diff), " base_param: ", type(
-                    base_param), " curr_param ", type(curr_param))
             # Total loss due to log likelihood and weight restraint
-            diff_loss = 0.001*sqrt(diff)
+            diff_loss = 0.001*diff.sqrt()
             print(type(diff_loss))
             print(type(likelihood_loss))
             diff_loss.backward()
