@@ -135,7 +135,7 @@ class MbPA(nn.Module):
 
         return keys
 
-    def infer(self, content, attn_mask, rt_batch):
+    def infer(self, content, attn_mask, K_contents, K_attn_masks, K_labels):
         """
         Function that performs inference based on memory based local adaptation
         Parameters:
@@ -151,8 +151,6 @@ class MbPA(nn.Module):
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
             adaptive_classifier.parameters(), lr=1e-3)
-        # unpack the contents,attn_masks,labels from retrived batch
-        K_contents, K_attn_masks, K_labels = rt_batch
         # Train the adaptive classifier for L epochs with the rt_batch
         for _ in trange(self.L, desc='Local Adaptation'):
 
@@ -161,6 +159,7 @@ class MbPA(nn.Module):
             likelihood_loss, _ = adaptive_classifier(
                 K_contents, attention_mask=K_attn_masks, labels=K_labels)
             diff_loss = 0
+            print("Log loss")
             # Current model weights
             curr_weights = adaptive_classifier.parameters()
 
@@ -171,17 +170,19 @@ class MbPA(nn.Module):
                 diff = (base_param-curr_param).pow(2).sum()
                 diff_loss += diff
             # Total loss due to log likelihood and weight restraint
+            print("Diff loss")
             total_loss = likelihood_loss + 0.001*sqrt(diff_loss)
             total_loss.backward()
             optimizer.step()
-        # Delete the rt_batch after training to freeup memory
-        del rt_batch
+        # Delete the k neigbours after training to freeup memory
+        print("Print k")
         del K_contents
         del K_attn_masks
         del K_labels
 
         logits, = adaptive_classifier(content.unsqueeze(
             0), attention_mask=attn_mask.unsqueeze(0))
+        print("logits")
         del content
         del attn_mask
 
