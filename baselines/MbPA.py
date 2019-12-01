@@ -176,7 +176,7 @@ class MbPA(nn.Module):
         # Delete the rt_batch after training to freeup memory
         del rt_batch
 
-        logits, _ = adaptive_classifier(content.unsqueeze(
+        logits, = adaptive_classifier(content.unsqueeze(
             0), attention_mask=attn_mask.unsqueeze(0))
         del content
         del attn_mask
