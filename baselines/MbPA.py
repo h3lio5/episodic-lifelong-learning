@@ -176,13 +176,13 @@ class MbPA(nn.Module):
         del K_contents
         del K_attn_masks
         del K_labels
+        del base_weights
+
+        logits, = adaptive_classifier(content.unsqueeze(
+            0), attention_mask=attn_mask.unsqueeze(0))
         del curr_weights
         del adaptive_classifier
         del optimizer
-        del base_weights
-        logits, = adaptive_classifier(content.unsqueeze(
-            0), attention_mask=attn_mask.unsqueeze(0))
-
         del content
         del attn_mask
 
