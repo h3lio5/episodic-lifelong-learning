@@ -104,10 +104,11 @@ class MbPA(nn.Module):
                 '../pretrained_bert_tc/key_encoder/config.json')
             self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
-
+            # base model weights
+            base_weights = self.classifier.parameters()
             # # Freeze the base model weights
-            # for param in self.base_weights:
-            #     param.requires_grad = False
+            for param in self.base_weights:
+                param.requires_grad = False
 
         # Number of local adaptation steps
         self.L = L
@@ -150,8 +151,7 @@ class MbPA(nn.Module):
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
             adaptive_classifier.parameters(), lr=1e-3)
-        # base model weights
-        base_weights = self.classifier.parameters()
+
         # Current model weights
         curr_weights = adaptive_classifier.parameters()
         # Train the adaptive classifier for L epochs with the rt_batch
