@@ -188,7 +188,7 @@ def test(order, model, memory):
                 rt_labels = rt_batch[2].cuda()
 
             logits = model.infer(content, attn_mask,
-                                 (rt_contents, rt_attn_masks, rt_labels))
+                                 rt_contents, rt_attn_masks, rt_labels)
             # After performing inference delete the batch data to free gpu memory
             print("deleting content,attn_mask,rt_batch")
             del content
