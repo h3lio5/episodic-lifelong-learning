@@ -170,8 +170,9 @@ class MbPA(nn.Module):
             # Total loss due to log likelihood and weight restraint
             diff_loss = 0.001*diff.sqrt()
             print(type(diff_loss))
-            print(type(likelihood_loss))
+            print("diff reached")
             diff_loss.backward()
+            print("diff passed")
             likelihood_loss.backward()
             optimizer.step()
         # Delete the k neigbours after training to freeup memory
