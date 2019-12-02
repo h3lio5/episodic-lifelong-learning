@@ -166,7 +166,7 @@ class MbPA(nn.Module):
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
                 diff += (base_param.data-curr_param).pow(2).sum()
-                print(base_param.requires_grad)
+                print(base_param.is_cuda)
             # Total loss due to log likelihood and weight restraint
             diff_loss = 0.001*diff.sqrt()
             print(type(diff_loss))
