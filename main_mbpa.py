@@ -169,16 +169,10 @@ def test(order, model, memory):
         batch_cp = copy.deepcopy(batch)
         del batch
         contents, attn_masks, labels = batch_cp
-        print("before batch put on cuda ", torch.cuda.memory_allocated())
         if use_cuda:
             contents = contents.squeeze(1).cuda()
             attn_masks = attn_masks.squeeze(1).cuda()
-        print("after batch put on cuda ", torch.cuda.memory_allocated())
         keys = model.get_keys(contents, attn_masks)
-        print("after getting key and batch on cuda ",
-              torch.cuda.memory_allocated())
-        # contents = contents.cpu()
-        # attn_masks = attn_masks.cpu()
         retrieved_batches = memory.get_neighbours(keys.cpu().numpy())
         del keys
         ans_logits = []
@@ -186,13 +180,10 @@ def test(order, model, memory):
         # and store them in a list for comparision later
         for content, attn_mask, (rt_contents, rt_attn_masks, rt_labels) in zip(contents, attn_masks, retrieved_batches):
             if use_cuda:
-                # content = content.cuda()
-                # attn_mask = attn_mask.cuda()
                 rt_contents = rt_contents.cuda()
                 rt_attn_masks = rt_attn_masks.cuda()
                 rt_labels = rt_labels.cuda()
-            print("after rt_batch and doc,attn_mask on cuda ",
-                  torch.cuda.memory_allocated())
+
             logits = model.infer(content, attn_mask,
                                  rt_contents, rt_attn_masks, rt_labels)
 
