@@ -169,13 +169,18 @@ def test(order, model, memory):
         batch_cp = copy.deepcopy(batch)
         del batch
         contents, attn_masks, labels = batch_cp
+        print("before batch put on cuda ", torch.cuda.memory_allocated())
         if use_cuda:
             contents = contents.squeeze(1).cuda()
             attn_masks = attn_masks.squeeze(1).cuda()
+        print("after batch put on cuda ", torch.cuda.memory_allocated())
         keys = model.get_keys(contents, attn_masks)
+        print("after getting key and batch on cuda ",
+              torch.cuda.memory_allocated())
         contents = contents.cpu()
         attn_masks = attn_masks.cpu()
         retrieved_batches = memory.get_neighbours(keys.cpu().numpy())
+        print("after batch converted to cpu ", torch.cuda.memory_allocated())
         del keys
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
@@ -187,7 +192,8 @@ def test(order, model, memory):
                 rt_contents = rt_contents.cuda()
                 rt_attn_masks = rt_attn_masks.cuda()
                 rt_labels = rt_labels.cuda()
-
+            print("after rt_batch and doc,attn_mask on cuda ",
+                  torch.cuda.memory_allocated())
             logits = model.infer(content, attn_mask,
                                  rt_contents, rt_attn_masks, rt_labels)
             # After performing inference delete the batch data to free gpu memory
@@ -196,6 +202,8 @@ def test(order, model, memory):
             del rt_contents
             del rt_attn_masks
             del rt_labels
+            print("after deleting all except logits ",
+                  torch.cuda.memory_allocated())
             ans_logits.append(logits)
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
