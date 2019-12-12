@@ -174,20 +174,9 @@ class MbPA(nn.Module):
             likelihood_loss.backward()
             optimizer.step()
         # Delete the k neigbours after training to freeup memory
-        del diff_loss
-        del likelihood_loss
-        del K_contents
-        del K_attn_masks
-        del K_labels
 
         logits, = adaptive_classifier(content.unsqueeze(
             0), attention_mask=attn_mask.unsqueeze(0))
-        del curr_weights
-        del adaptive_classifier
-        del optimizer
-        del content
-        del attn_mask
-        pdb.set_trace()
 
         return logits.detach()
 
