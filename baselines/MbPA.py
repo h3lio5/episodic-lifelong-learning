@@ -4,6 +4,7 @@ import transformers
 import numpy as np
 from tqdm import trange
 import copy
+import pdb
 
 
 class ReplayMemory(object):
@@ -104,10 +105,10 @@ class MbPA(nn.Module):
             self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
             # base model weights
-            self.base_weights = list(self.classifier.parameters())
+            self.base_weights = list()
             # # Freeze the base model weights
-            for param in self.base_weights:
-                param.requires_grad = False
+            for param in self.classifier.parameters():
+                self.base_weights.append(param.data)
 
         # Number of local adaptation steps
         self.L = L
@@ -168,7 +169,7 @@ class MbPA(nn.Module):
                 diff += (curr_param-base_param.data).pow(2).sum()
                 print("cuda or not", base_param.is_cuda)
             # Total loss due to log likelihood and weight restraint
-            diff_loss = 0.001*diff.sqrt()
+            diff_loss = 0.001*diff
             print(type(diff_loss))
             print("diff reached")
             diff_loss.backward()
@@ -189,6 +190,7 @@ class MbPA(nn.Module):
         del optimizer
         del content
         del attn_mask
+        pdb.set_trace()
 
         return logits
 
