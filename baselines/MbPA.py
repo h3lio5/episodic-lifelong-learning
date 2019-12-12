@@ -155,7 +155,7 @@ class MbPA(nn.Module):
         # Current model weights
         curr_weights = list(adaptive_classifier.parameters())
         # Train the adaptive classifier for L epochs with the rt_batch
-        for _ in trange(self.L, desc='Local Adaptation'):
+        for _ in range(self.L):
 
             # zero out the gradients
             optimizer.zero_grad()
