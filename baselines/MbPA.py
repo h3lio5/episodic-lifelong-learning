@@ -108,7 +108,7 @@ class MbPA(nn.Module):
             self.base_weights = list()
             # # Freeze the base model weights
             for param in self.classifier.parameters():
-                self.base_weights.append(param.data)
+                self.base_weights.append(param.data.cuda())
 
         # Number of local adaptation steps
         self.L = L
