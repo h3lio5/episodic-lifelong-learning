@@ -166,15 +166,11 @@ class MbPA(nn.Module):
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
-                print("b ", base_param.is_cuda, " c", curr_param.is_cuda)
                 diff += (curr_param-base_param).pow(2).sum()
-                print("cuda or not", base_param.is_cuda)
+
             # Total loss due to log likelihood and weight restraint
             diff_loss = 0.001*diff
-            print(type(diff_loss))
-            print("diff reached")
             diff_loss.backward()
-            print("diff passed")
             likelihood_loss.backward()
             optimizer.step()
         # Delete the k neigbours after training to freeup memory
