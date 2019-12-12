@@ -189,7 +189,7 @@ class MbPA(nn.Module):
         del attn_mask
         pdb.set_trace()
 
-        return logits.detach()
+        return logits
 
     def save_state(self):
         """
