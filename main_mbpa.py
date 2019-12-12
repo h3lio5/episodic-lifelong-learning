@@ -204,7 +204,7 @@ def test(order, model, memory):
             del rt_labels
             print("after deleting all except logits ",
                   torch.cuda.memory_allocated())
-            ans_logits.append(logits)
+            ans_logits.append(logits.cpu())
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
         labels = labels.squeeze(1).numpy()
