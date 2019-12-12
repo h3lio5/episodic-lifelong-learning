@@ -159,7 +159,7 @@ def test(order, model, memory):
 
     test_data = DataSet(order, split='test')
     test_dataloader = data.DataLoader(
-        test_data, shuffle=True, batch_size=args.batch_size)
+        test_data, shuffle=True, batch_size=args.batch_size, num_workers=4)
 
     # Tracking variables
     total_correct, tmp_correct, t_steps = 0, 0, 0
