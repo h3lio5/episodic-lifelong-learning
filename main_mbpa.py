@@ -165,7 +165,7 @@ def test(order, model, memory):
     total_correct, tmp_correct, t_steps = 0, 0, 0
 
     print("Validation step started...")
-    for step, batch in enumerate(tqdm(test_dataloader)):
+    for batch in tqdm(test_dataloader):
         batch_cp = copy.deepcopy(batch)
         del batch
         contents, attn_masks, labels = batch_cp
@@ -178,7 +178,7 @@ def test(order, model, memory):
         ans_logits = []
         # Iterate over the test batch to calculate label for each document(i.e,content)
         # and store them in a list for comparision later
-        for content, attn_mask, (rt_contents, rt_attn_masks, rt_labels) in zip(contents, attn_masks, retrieved_batches):
+        for content, attn_mask, (rt_contents, rt_attn_masks, rt_labels) in tqdm(zip(contents, attn_masks, retrieved_batches), total=len(contents)):
             if use_cuda:
                 rt_contents = rt_contents.cuda()
                 rt_attn_masks = rt_attn_masks.cuda()
