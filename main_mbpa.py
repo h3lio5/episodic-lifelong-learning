@@ -196,14 +196,15 @@ def test(order, model, memory):
                   torch.cuda.memory_allocated())
             logits = model.infer(content, attn_mask,
                                  rt_contents, rt_attn_masks, rt_labels)
+            print("logits on cuda? ", logits.is_cuda)
             # After performing inference delete the batch data to free gpu memory
-            del content
-            del attn_mask
-            del rt_contents
-            del rt_attn_masks
-            del rt_labels
-            print("after deleting all except logits ",
-                  torch.cuda.memory_allocated())
+            # del content
+            # del attn_mask
+            # del rt_contents
+            # del rt_attn_masks
+            # del rt_labels
+            # print("after deleting all except logits ",
+            #   torch.cuda.memory_allocated())
             ans_logits.append(logits.cpu())
         # Dropping the 1 dim to match the logits' shape
         # shape : (batch_size,num_labels)
