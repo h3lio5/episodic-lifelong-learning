@@ -82,7 +82,7 @@ class MbPA(nn.Module):
     Implements Memory based Parameter Adaptation model
     """
 
-    def __init__(self, L=30, model_state=None):
+    def __init__(self, L=5, model_state=None):
         super(MbPA, self).__init__()
 
         if model_state is None:
