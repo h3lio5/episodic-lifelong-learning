@@ -28,5 +28,5 @@ The probability of the end index of the answer analogously using w<sub>end</sub>
    The memory has two retrieval mechanisms: (i) random sampling and (ii) K-nearest neighbors
 ## Training and Inference
 Illustration of training and inference:
-![Training](images/inference_resized_new.png)
+![Training](images/training_resized_new.png) ![Inference](images/inference_resized_new.png)
   
