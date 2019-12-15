@@ -6,8 +6,11 @@ The ability to continuously learn and accumulate knowledge throughout a lifetime
 ## Model
 Main components of the model
 ### Example Encoder
-Text classification : x<sub>t</sub> is a document to be classified; BERT produces a vector representation of each token in x<sub>t</sub>, which includes a special beginning-of-document symbol CLS as x<sub>t,0</sub>.   
-Question answering: x<sub>t</sub> is a concatenation of a context paragraph x<sub>t</sub><sup>context</sup> and a question x<sub>t</sub><sup>question</sup> separated by a special separator symbol SEP.
+*Text Classification:* x<sub>t</sub> is a document to be classified; BERT produces a vector representation of each token in x<sub>t</sub>, which includes a special beginning-of-document symbol CLS as x<sub>t,0</sub>.   
+*Question Answering:* x<sub>t</sub> is a concatenation of a context paragraph x<sub>t</sub><sup>context</sup> and a question x<sub>t</sub><sup>question</sup> separated by a special separator symbol SEP.
 ### Task Decoder
 *Text classification:* following the original BERT model, select the representation of the first token x<sub>t,0</sub> from BERT (i.e., the special beginning-of-document symbol) and add a linear transformation and a softmax layer to predict the class of x<sub>t</sub>.
-![Encoder](images/enc_tc_resized.png)
+![encoder_tc](images/enc_tc_resized.png)
+*Question Answering:* The decoder predicts an answer span—the start and end indices of the correct answer in the context.
+The probability of each context token being the start of the answer is computed as:
+
