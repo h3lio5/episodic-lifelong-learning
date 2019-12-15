@@ -36,3 +36,15 @@ At inference time, given a test example, a query vector of the test example is o
 ![Local_Adaptation](images/loacal_adaptation_resized.png)
 𝝀 is a hyperparameter, ⍺<sub>k</sub> is the weight of the retrieved examples equal to 1/k.
 *Note*: W<sub>i</sub> is only used to make a prediction for the i-th example, and the parameters are reset to W afterwards. In practice, only L local adaptation gradient steps are performed instead of finding the true minimum of the above equation.
+## Documents
+
+### Dependencies
+	Run pip3 install -r requirements.txt to download all the dependencies
+	
+### Directory description
+
+<pre><code>Root
+├─data/*        Store the data files used by models.
+├─baselines/*   Store the source code of the various baseline models.
+└─models/*     Store the sorce code for target model.
+</code></pre>
