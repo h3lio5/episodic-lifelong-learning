@@ -6,7 +6,7 @@ The ability to continuously learn and accumulate knowledge throughout a lifetime
 ## Model
 Main components of the model are:
 * ### Example Encoder:
-  * <strong><ins><Text Classification</ins></strong>: x<sub>t</sub> is a document to be classified; BERT produces a vector representation of each token in x<sub>t</sub>, which includes a special beginning-of-document symbol CLS as x<sub>t,0</sub>.   
+  * <strong><ins>Text Classification</ins></strong>: x<sub>t</sub> is a document to be classified; BERT produces a vector representation of each token in x<sub>t</sub>, which includes a special beginning-of-document symbol CLS as x<sub>t,0</sub>.   
   * <strong><ins>Question Answering</ins></strong>: x<sub>t</sub> is a concatenation of a context paragraph x<sub>t</sub><sup>context</sup> and a question x<sub>t</sub><sup>question</sup> separated by a special separator symbol SEP.
 * ### Task Decoder:
   * <strong><ins>Text classification</ins></strong>: following the original BERT model, select the representation of the first token x<sub>t,0</sub> from BERT (i.e., the special beginning-of-document symbol) and add a linear transformation and a softmax layer to predict the class of x<sub>t</sub>. The probability of the text being classified as class c is computed as:   
@@ -17,4 +17,16 @@ The probability of each context token being the start of the answer is computed 
 where x<sub>t,m</sub><sup>context</sup> is the encoded representation of m<sup>th</sup> token in the context.   
 The probability of the end index of the answer analogously using w<sub>end</sub>. The predicted answer is the span with the highest probability after multiplying the start and end probabilities.    
 *Note:* To take into account that the start index of an answer needs to precede its end index by setting the probabilities of invalid spans to zero.
-
+* ### Episodic Memory:
+  * <strong><ins>Architecture</ins></strong>: The model is augmented with an episodic memory module that stores previously seen examples throughout its lifetime. The module is a key-value memory block. The key representation of x<sub>t</sub> (denoted by <sub>u</sub>) is obtained using a key network—which is a pretrained BERT model separate from the example encoder. The key network is freezed to prevent key representations from drifting as data distribution changes.     
+   *Text Classification*: The key is an encoded representation of the first token of the document to be classified, so      u<sub>t</sub> = x<sub>t,0</sub> (i.e., the special beginning-of-document symbol).       
+   *Question Answering*: The key is the encoded representation of the first token of the question, so u<sub>t</sub> = x<sub>t,0</sub><sup>question</sup>.
+   For both tasks, the input and the label ⟨x<sub>t</sub> , y<sub>t</sub> ⟩ is stored as its associated memory value.
+  * <strong><ins>Write</ins></strong>:
+   In this paper, the authors have suggested to randomly decide whether to write a newly seen example into the memory with some probability.
+   * <strong><ins>Read</ins></strong>:
+   The memory has two retrieval mechanisms: (i) random sampling and (ii) K-nearest neighbors
+## Training and Inference
+Illustration of training and inference:
+![Training](images/training.png)
+  
