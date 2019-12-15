@@ -28,5 +28,11 @@ The probability of the end index of the answer analogously using w<sub>end</sub>
    The memory has two retrieval mechanisms: (i) random sampling and (ii) K-nearest neighbors
 ## Training and Inference
 Illustration of training and inference:
-![Training](images/training_resized_new.png)![Inference](images/inference_resized_new.png)
+![Train_Infer](images/train_infer_new.png)
+### Sparse experience replay:
+At a certain interval(1% replay rate) throughout the learning period, uniformly sample from stored examples in the memory and perform gradient updates of the encoder-decoder network based on the retrieved examples. It helps mitigate catestophic forgetting.
+### Local Adaptation:
+At inference time, given a test example, a query vector of the test example is obtained using the key network and query the memory to retrieve K nearest neighbors using the Euclidean distance function. These K examples are used to perform local adaptation. Gradient-based local adaptation to update parameters of the encoder-decoder model—denoted by W—to obtain local parameters W<sub>i</sub> to be used for the current prediction as follows:
+![Local_Adaptation](images/local_adaptation_resized.png)
+
   
