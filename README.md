@@ -10,3 +10,4 @@ Text classification : x<sub>t</sub> is a document to be classified; BERT produce
 Question answering: x<sub>t</sub> is a concatenation of a context paragraph x<sub>t</sub><sup>context</sup> and a question x<sub>t</sub><sup>question</sup> separated by a special separator symbol SEP.
 ### Task Decoder
 *Text classification:* following the original BERT model, select the representation of the first token x<sub>t,0</sub> from BERT (i.e., the special beginning-of-document symbol) and add a linear transformation and a softmax layer to predict the class of x<sub>t</sub>.
+![Encoder]('images/encoder_tc.png')
