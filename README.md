@@ -33,6 +33,6 @@ Illustration of training and inference:
 At a certain interval(1% replay rate) throughout the learning period, uniformly sample from stored examples in the memory and perform gradient updates of the encoder-decoder network based on the retrieved examples. It helps mitigate catestophic forgetting.
 ### Local Adaptation:
 At inference time, given a test example, a query vector of the test example is obtained using the key network and query the memory to retrieve K nearest neighbors using the Euclidean distance function. These K examples are used to perform local adaptation. Gradient-based local adaptation to update parameters of the encoder-decoder model—denoted by W—to obtain local parameters W<sub>i</sub> to be used for the current prediction as follows:
-![Local_Adaptation](images/local_adaptation_resized.png)
-
-  
+![Local_Adaptation](images/loacal_adaptation_resized.png)
+𝝀 is a hyperparameter, ⍺<sub>k</sub> is the weight of the retrieved examples equal to 1/k.
+*Note*: W<sub>i</sub> is only used to make a prediction for the i-th example, and the parameters are reset to W afterwards. In practice, only L local adaptation gradient steps are performed instead of finding the true minimum of the above equation.
