@@ -11,10 +11,7 @@ class DataSet(data.Dataset):
         df = pd.read_csv('../data/ordered_data/'+split+'/'+str(order)+'.csv')
         self.labels = df.labels.values
         self.content = df.content.values
-        # If vocab.txt not available locally, then
-        # self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-        self.tokenizer = BertTokenizer.from_pretrained(
-            '../pretrained_bert_tc/vocab.txt')
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
     def __len__(self):
 
