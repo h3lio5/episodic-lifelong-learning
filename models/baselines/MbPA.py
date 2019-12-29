@@ -82,31 +82,34 @@ class MbPA(nn.Module):
     Implements Memory based Parameter Adaptation model
     """
 
-    def __init__(self, L=5, model_state=None):
+    def __init__(self, L=30, model_state=None):
         super(MbPA, self).__init__()
 
         if model_state is None:
             # Key network to find key representation of content
             self.key_encoder = transformers.BertModel.from_pretrained(
-                '../pretrained_bert_tc/key_encoder')
+                'bert-base-uncased')
             # Bert model for text classification
             self.classifier = transformers.BertForSequenceClassification.from_pretrained(
-                '../pretrained_bert_tc/classifier')
+                'bert-base-uncased', num_labels=33)
 
         else:
 
             cls_config = transformers.BertConfig.from_pretrained(
-                '../pretrained_bert_tc/classifier/config.json', num_labels=33)
+                'bert-base-uncased', num_labels=33)
             self.classifier = transformers.BertForSequenceClassification(
                 cls_config)
             self.classifier.load_state_dict(model_state['classifier'])
             key_config = transformers.BertConfig.from_pretrained(
-                '../pretrained_bert_tc/key_encoder/config.json')
+                'bert-base-uncased')
             self.key_encoder = transformers.BertModel(key_config)
             self.key_encoder.load_state_dict(model_state['key_encoder'])
-            # base model weights
-            self.base_weights = self.classifier.clone().detach().to(self.classifier.device)
-
+            # load base model weights
+            # we need to detach since parameters() method returns reference to the original parameters
+            self.base_weights = self.classifier.parameters(
+            ).clone().detach().to("cuda" if torch.cuda.is_available() else "cpu")
+        # local adaptation learning rate - 1e-3 or 5e-3
+        self.loc_adapt_lr = 1e-3
         # Number of local adaptation steps
         self.L = L
 
@@ -147,7 +150,7 @@ class MbPA(nn.Module):
         # create a local copy of the classifier network
         adaptive_classifier = copy.deepcopy(self.classifier)
         optimizer = transformers.AdamW(
-            adaptive_classifier.parameters(), lr=1e-3)
+            adaptive_classifier.parameters(), lr=self.loc_adapt_lr)
 
         # Current model weights
         curr_weights = list(adaptive_classifier.parameters())
@@ -158,17 +161,17 @@ class MbPA(nn.Module):
             optimizer.zero_grad()
             likelihood_loss, _ = adaptive_classifier(
                 K_contents, attention_mask=K_attn_masks, labels=K_labels)
-
-            diff = torch.Tensor([0]).cuda()
+            # Initialize diff_loss to zero and place it on the appropriate device
+            diff_loss = torch.Tensor([0]).to(
+                "cuda" if torch.cuda.is_available() else "cpu")
             # Iterate over base_weights and curr_weights and accumulate the euclidean norm
             # of their differences
             for base_param, curr_param in zip(self.base_weights, curr_weights):
-                diff += (curr_param-base_param).pow(2).sum()
+                diff_loss += (curr_param-base_param).pow(2).sum()
 
             # Total loss due to log likelihood and weight restraint
-            diff_loss = 0.001*diff
-            diff_loss.backward()
-            likelihood_loss.backward()
+            total_loss = 0.001*diff_loss + likelihood_loss
+            total_loss.backward()
             optimizer.step()
 
         logits, = adaptive_classifier(content.unsqueeze(
