@@ -45,6 +45,6 @@ At inference time, given a test example, a query vector of the test example is o
 
 <pre><code>Root
 ├─data/*        Store the data files used by models.
-├─baselines/*   Store the source code of the various baseline models.
-└─models/*     Store the sorce code for target model.
+├─models/*   Store the source code of the various baseline models.
+└─main.p     Store the sorce code for target model.
 </code></pre>
