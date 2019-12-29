@@ -8,7 +8,7 @@ class DataSet(data.Dataset):
 
     def __init__(self, order=1, split='train'):
 
-        df = pd.read_csv('../data/ordered_data/'+split+'/'+str(order)+'.csv')
+        df = pd.read_csv('data/ordered_data/'+split+'/'+str(order)+'.csv')
         self.labels = df.labels.values
         self.content = df.content.values
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
