@@ -89,4 +89,4 @@ To preprocess and create ordered datasets, run <code>python3 preprocess.py</code
 ## Train
 To train the model from scratch, run <code> python3 main.py --mode train --epochs "any_number" --order "1/2/3/4" </code>
 ## Inference
-To test the model, run <code> python3 main.py --mode test </code>
+To test the model, run <code> python3 main.py --mode test --model_path "path_to_checkpoint" --memory_path "path_to_replay_memory" </code>
