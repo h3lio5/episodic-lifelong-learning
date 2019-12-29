@@ -21,10 +21,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=32,
                     help='Enter the batch size')
 parser.add_argument('--mode', default='train',
-                    help='Enter the mode - train/eval')
+                    help='Enter the mode - train/test')
 parser.add_argument('--order', default=1, type=int,
                     help='Enter the dataset order - 1/2/3/4')
 parser.add_argument('--epochs', default=2, type=int)
+parser.add_argument('--model_path', type=str,
+                    help='Enter the path to the model weights')
+parser.add_argument('--memory_path', type=str,
+                    help='Enter the path to the replay memory')
+
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
 MODEL_NAME = 'MbPA++'
@@ -154,11 +159,15 @@ def train(order, model, memory):
     save_trainloss(train_loss_set, order)
 
 
-def save_checkpoint(model_dict, order, epoch, memory=None, base_loc='../model_checkpoints/'):
+def save_checkpoint(model_dict, order, epoch, memory=None):
     """
     Function to save a model checkpoint to the specified location
     """
-    checkpoints_dir = base_loc + MODEL_NAME
+    base_loc = './model_checkpoints'
+    if not os.path.exists(base_loc):
+        os.mkdir('model_checkpoints')
+
+    checkpoints_dir = base_loc + '/' + MODEL_NAME
     if not os.path.exists(checkpoints_dir):
         os.mkdir(checkpoints_dir)
     checkpoints_file = 'classifier_order_' + \
@@ -230,7 +239,7 @@ def test(order, model, memory):
     print("Validation Accuracy: {}".format(total_correct/t_steps))
 
 
-def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
+def save_trainloss(train_loss_set, order):
     """
     Function to save the image of training loss v/s iterations graph
     """
@@ -239,7 +248,11 @@ def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
     plt.xlabel("Batch")
     plt.ylabel("Loss")
     plt.plot(train_loss_set)
-    image_dir = base_loc + MODEL_NAME
+    base_loc = './loss_images'
+    if not os.path.exists(base_loc):
+        os.mkdir(base_loc)
+
+    image_dir = base_loc + '/' + MODEL_NAME
     if not os.path.exists(image_dir):
         os.mkdir(image_dir)
 
@@ -256,10 +269,10 @@ if __name__ == '__main__':
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/MbPA++/classifier_order_1_epoch_2.pth')
+            args.model_path)
         model = MbPAplusplus(model_state=model_state)
         buffer = {}
-        with open('../model_checkpoints/MbPA++/order_1_epoch_2.pkl', 'rb') as f:
+        with open(args.memory_path, 'rb') as f:
             buffer = pickle.load(f)
         memory = ReplayMemory(buffer=buffer)
         test(args.order, model, memory)
