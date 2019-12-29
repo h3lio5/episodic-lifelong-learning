@@ -4,7 +4,6 @@ import re
 import pickle
 import swifter
 import time
-import argparse
 
 TC_NUM_CLASSES = {
     'yelp': 5,
@@ -41,11 +40,6 @@ INDIVIDUAL_CLASS_LABELS = {
     'agnews': {1: 'World', 2: 'Sports', 3: 'Business', 4: 'Sci/Tech'}
 }
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--split', default='train',
-                    help='Enter the split: train/test')
-args = parser.parse_args()
-
 
 def preprocess(text):
     """
@@ -74,7 +68,7 @@ def preprocess(text):
     return str(text)
 
 
-def create_ordered_tc_data(order, base_location='../data/original_data', save_location='../data/ordered_data', split='train'):
+def create_ordered_tc_data(order, base_location='data/original_data', save_location='data/ordered_data', split='train'):
     """
     creates ordered dataset for text classification with a maximum of 115,000 sequences
     and 7,600 sequences from each individual dataset for train and test data respectively
@@ -190,16 +184,20 @@ if __name__ == "__main__":
 
     # create ordered dataset
     total_time = 0
-    if args.split == 'test':
-        order = 1
-    else:
-        order = 4
-    print("Started generating {} data".format(args.split))
-    for i in range(order):
+    total_order = 4
+    print("Started generating training data")
+    for i in range(total_order):
         print("Started for order {}".format(i+1))
         start = time.time()
-        create_ordered_tc_data(i+1, split=args.split)
+        create_ordered_tc_data(i+1, split='train')
         end = time.time()
         print("Time taken for order {} : {} minutes".format(i+1, (end-start)/60))
         total_time += (end-start)/60
-    print("Total time taken: {}".format(total_time))
+    print("Total time taken: {} for generating training data".format(total_time))
+    # create test data
+    print("Started generating testing data")
+    start = time.time()
+    create_ordered_tc_data(i+1, split='train')
+    end = time.time()
+    print("Total time taken: {} for generating testing data".format((end-start)/60))
+    print("Completed preprocessing :)")
