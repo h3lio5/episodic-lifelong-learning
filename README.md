@@ -42,9 +42,12 @@ At inference time, given a test example, a query vector of the test example is o
 	Run pip3 install -r requirements.txt to download all the dependencies
 	
 ### Directory description
+Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
+The dataset files that you need to download and extract are as follows:
+* yelp_review_full_csv.tar.gz
+* yahoo_answers_csv.tar.gz
+* ag_news_csv.tar.gz
+* amazon_review_full_csv.tar.gz
+* dbpedia_csv.tar.gz
+   
 
-<pre><code>Root
-├─data/*        Store the data files used by models.
-├─models/*   Store the source code of the various baseline models.
-└─main.p     Store the sorce code for target model.
-</code></pre>
