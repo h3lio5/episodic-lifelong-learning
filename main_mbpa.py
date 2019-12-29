@@ -2,7 +2,7 @@ import torch
 import torch.utils.data as data
 from data_loader import DataSet
 import argparse
-from baselines.MbPA import ReplayMemory, MbPA
+from models.MbPAplusplus import ReplayMemory, MbPAplusplus
 import transformers
 from tqdm import trange, tqdm
 import time
@@ -17,7 +17,6 @@ use_cuda = True if torch.cuda.is_available() else False
 # of algorithms to use for the hardware leading to faster runtime.
 torch.backends.cudnn.benchmark = True
 torch.backends.cudnn.enabled = True
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch_size', type=int, default=32,
                     help='Enter the batch size')
@@ -28,12 +27,17 @@ parser.add_argument('--order', default=1, type=int,
 parser.add_argument('--epochs', default=2, type=int)
 args = parser.parse_args()
 LEARNING_RATE = 3e-5
-
-MODEL_NAME = 'MbPA'
+MODEL_NAME = 'MbPA++'
+# Due to memory restraint, we sample only 64 examples from
+# stored memory after every 6400(1% replay rate) new examples seen
+# as opposed to 100 suggested in the paper. The sampling is done after
+# performing 200 steps(6400/32).
+REPLAY_FREQ = 201
 
 
 def train(order, model, memory):
     """
+    Train function
     """
     workers = 0
     if use_cuda:
@@ -59,8 +63,7 @@ def train(order, model, memory):
          'weight_decay_rate': 0.0}]
     optimizer = transformers.AdamW(
         optimizer_grouped_parameters, lr=LEARNING_RATE)
-    scheduler = transformers.WarmupLinearSchedule(
-        optimizer, warmup_steps=100, t_total=1000)
+
     # Store our loss and accuracy for plotting
     train_loss_set = []
     # trange is a tqdm wrapper around the normal python range
@@ -79,6 +82,33 @@ def train(order, model, memory):
             # there are too many batches at dataloader
             batch_cp = copy.deepcopy(batch)
             del batch
+            # Perform sparse experience replay after every REPLAY_FREQ steps
+            if (step+1) % REPLAY_FREQ == 0:
+                # sample 64 examples from memory
+                content, attn_masks, labels = memory.sample(sample_size=64)
+                if use_cuda:
+                    content = content.cuda()
+                    attn_masks = attn_masks.cuda()
+                    labels = labels.cuda()
+                 # Clear out the gradients (by default they accumulate)
+                optimizer.zero_grad()
+                # Forward pass
+                loss, logits = model.classify(content, attn_masks, labels)
+                train_loss_set.append(loss.item())
+                # Backward pass
+                loss.backward()
+                # Update parameters and take a step using the computed gradient
+                optimizer.step()
+
+                # Update tracking variables
+                tr_loss += loss.item()
+                nb_tr_examples += content.size(0)
+                nb_tr_steps += 1
+
+                del content
+                del attn_masks
+                del labels
+                del loss
             # Unpacking the batch items
             content, attn_masks, labels = batch_cp
             content = content.squeeze(1)
@@ -219,17 +249,29 @@ def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--batch_size', type=int, default=32,
+                        help='Enter the batch size')
+    parser.add_argument('--mode', default='train',
+                        help='Enter the mode - train/eval')
+    parser.add_argument('--order', default=1, type=int,
+                        help='Enter the dataset order - 1/2/3/4')
+    parser.add_argument('--epochs', default=2, type=int)
+    args = parser.parse_args()
+    LEARNING_RATE = 3e-5
+    MODEL_NAME = 'MbPA++'
+
     if args.mode == 'train':
-        model = MbPA()
+        model = MbPAplusplus()
         memory = ReplayMemory()
         train(args.order, model, memory)
 
     if args.mode == 'test':
         model_state = torch.load(
-            '../model_checkpoints/MbPA/classifier_order_1_epoch_2.pth')
-        model = MbPA(model_state=model_state)
+            '../model_checkpoints/MbPA++/classifier_order_1_epoch_2.pth')
+        model = MbPAplusplus(model_state=model_state)
         buffer = {}
-        with open('../model_checkpoints/MbPA/order_1_epoch_2.pkl', 'rb') as f:
+        with open('../model_checkpoints/MbPA++/order_1_epoch_2.pkl', 'rb') as f:
             buffer = pickle.load(f)
         memory = ReplayMemory(buffer=buffer)
         test(args.order, model, memory)
