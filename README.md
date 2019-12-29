@@ -83,3 +83,10 @@ root
 ├── preprocess.py
 └── requirements.txt
 </code></pre>
+## Preprocessing
+To preprocess and create ordered datasets, run <code>python3 preprocess.py</code>
+</br>
+## Train
+To train the model from scratch, run <code> python3 main.py --mode train --epochs "any_number" --order "1/2/3/4" </code>
+## Inference
+To test the model, run <code> python3 main.py --mode test </code>
