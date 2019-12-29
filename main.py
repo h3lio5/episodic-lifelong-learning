@@ -249,18 +249,6 @@ def save_trainloss(train_loss_set, order, base_loc='../loss_images/'):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--batch_size', type=int, default=32,
-                        help='Enter the batch size')
-    parser.add_argument('--mode', default='train',
-                        help='Enter the mode - train/eval')
-    parser.add_argument('--order', default=1, type=int,
-                        help='Enter the dataset order - 1/2/3/4')
-    parser.add_argument('--epochs', default=2, type=int)
-    args = parser.parse_args()
-    LEARNING_RATE = 3e-5
-    MODEL_NAME = 'MbPA++'
-
     if args.mode == 'train':
         model = MbPAplusplus()
         memory = ReplayMemory()
