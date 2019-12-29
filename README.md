@@ -42,9 +42,51 @@ At inference time, given a test example, a query vector of the test example is o
 	Run pip3 install -r requirements.txt to download all the dependencies
 	
 ### Directory description
-
-<pre><code>Root
-├─data/*        Store the data files used by models.
-├─baselines/*   Store the source code of the various baseline models.
-└─models/*     Store the sorce code for target model.
+Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
+The dataset files that you need to download and extract are as follows:
+* yelp_review_full_csv.tar.gz
+* yahoo_answers_csv.tar.gz
+* ag_news_csv.tar.gz
+* amazon_review_full_csv.tar.gz
+* dbpedia_csv.tar.gz
+   
+place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name    
+The repository should like this after downloading and placing the data in the appropriate folders
+<pre><code>
+root
+├── README.md  
+├── data
+│   ├── ordered_data
+│   │   ├── test
+│   │   └── train
+│   └── original_data
+│       ├── test
+│       │   ├── agnews.csv
+│       │   ├── amazon.csv
+│       │   ├── dbpedia.csv
+│       │   ├── yahoo.csv
+│       │   └── yelp.csv
+│       └── train
+│           ├── agnews.csv
+│           ├── amazon.csv
+│           ├── dbpedia.csv
+│           ├── yahoo.csv
+│           └── yelp.csv
+├── data_loader.py
+├── main.py
+├── models
+│   ├── MbPAplusplus.py
+│   └── baselines
+│       ├── MbPA.py
+│       ├── enc_dec.py
+│       └── replay.py
+├── preprocess.py
+└── requirements.txt
 </code></pre>
+## Preprocessing
+To preprocess and create ordered datasets, run <code>python3 preprocess.py</code>
+</br>
+## Train
+To train the model from scratch, run <code> python3 main.py --mode train --epochs "any_number" --order "1/2/3/4" </code>
+## Inference
+To test the model, run <code> python3 main.py --mode test </code>
