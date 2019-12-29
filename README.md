@@ -52,8 +52,9 @@ The dataset files that you need to download and extract are as follows:
    
 place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name    
 The repository should like this after downloading and placing the data in the appropriate folders
+<pre><code>
 root
-├── README.md
+├── README.md  
 ├── data
 │   ├── ordered_data
 │   │   ├── test
@@ -81,3 +82,4 @@ root
 │       └── replay.py
 ├── preprocess.py
 └── requirements.txt
+</code></pre>
