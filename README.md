@@ -97,9 +97,8 @@ root
 ## 3.Preprocessing
 To preprocess and create ordered datasets, run 
 ``` Batchfile
- python preprocess.py
+python preprocess.py
 ```
-</br>
 ## 4.Training Model from Scratch
 To train your own model from scratch, run
 ``` Batchfile
