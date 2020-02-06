@@ -94,20 +94,20 @@ root
 ├── preprocess.py
 └── requirements.txt
 ```
-## Preprocessing
+## 3.Preprocessing
 To preprocess and create ordered datasets, run 
 ``` Batchfile
- 	python preprocess.py
+ python preprocess.py
 ```
 </br>
-## 2.Training Model from Scratch
+## 4.Training Model from Scratch
 To train your own model from scratch, run
-```Batchfile
+``` Batchfile
 python main.py --mode train --epochs "any_number" --order "1/2/3/4"
 ```     
-## Inference
+## 5.Inference
 To test the model, run 
-```Batchfile
+``` Batchfile
 python main.py --mode test --model_path "path_to_checkpoint" --memory_path "path_to_replay_memory"
 ```    
 ## References
