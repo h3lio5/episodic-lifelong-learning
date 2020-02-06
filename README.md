@@ -42,7 +42,7 @@ At inference time, given a test example, a query vector of the test example is o
 You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
 
 ``` Batchfile
-git clone https://github.com/h3lio5/linguistic-style-transfer-pytorch.git
+git clone https://github.com/h3lio5/episodic-lifelong-learning.git
 ```
 All dependencies required by this repo can be downloaded by creating a virtual environment with Python 3.7 and running
 
@@ -52,7 +52,7 @@ source .env/bin/activate
 pip install -r requirements.txt
 ```
 	
-### Directory description
+## 2.Directory description
 Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
 The dataset files that you need to download and extract are as follows:
 * yelp_review_full_csv.tar.gz
@@ -61,9 +61,9 @@ The dataset files that you need to download and extract are as follows:
 * amazon_review_full_csv.tar.gz
 * dbpedia_csv.tar.gz
    
-place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name    
+Place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name    
 The repository should like this after downloading and placing the data in the appropriate folders
-<pre><code>
+``` Batchfile
 root
 ├── README.md  
 ├── data
@@ -93,13 +93,23 @@ root
 │       └── replay.py
 ├── preprocess.py
 └── requirements.txt
-</code></pre>
+```
 ## Preprocessing
-To preprocess and create ordered datasets, run <code>python3 preprocess.py</code>
+To preprocess and create ordered datasets, run 
+``` Batchfile
+ 	python preprocess.py
+```
 </br>
-## Train
-To train the model from scratch, run <code> python3 main.py --mode train --epochs "any_number" --order "1/2/3/4" </code>
+## 2.Training Model from Scratch
+To train your own model from scratch, run
+```Batchfile
+python main.py --mode train --epochs "any_number" --order "1/2/3/4"
+```     
 ## Inference
-To test the model, run <code> python3 main.py --mode test --model_path "path_to_checkpoint" --memory_path "path_to_replay_memory" </code>
+To test the model, run 
+```Batchfile
+python main.py --mode test --model_path "path_to_checkpoint" --memory_path "path_to_replay_memory"
+```    
 ## References
 * Original Paper `Episodic Memory in Lifelong Language Learning` [(link)](https://openreview.net/pdf?id=B1z-sBHe8B)
+* Used pretrained BERT model from the awesome [huggingface](https://github.com/huggingface/transformers).
