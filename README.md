@@ -38,7 +38,7 @@ At inference time, given a test example, a query vector of the test example is o
 *Note*: W<sub>i</sub> is only used to make a prediction for the i-th example, and the parameters are reset to W afterwards. In practice, only L local adaptation gradient steps are performed instead of finding the true minimum of the above equation.
 ## Documents
 
-## 1.Setup Instructions and Dependencies
+### 1.Setup Instructions and Dependencies
 You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
 
 ``` Batchfile
@@ -52,7 +52,7 @@ source .env/bin/activate
 pip install -r requirements.txt
 ```
 	
-## 2.Directory description
+### 2.Directory description
 Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
 The dataset files that you need to download and extract are as follows:
 * yelp_review_full_csv.tar.gz
@@ -61,7 +61,7 @@ The dataset files that you need to download and extract are as follows:
 * amazon_review_full_csv.tar.gz
 * dbpedia_csv.tar.gz
    
-Place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name    
+Place the train and test csv files after renaming them according to their corresponding dataset names in the original_data subdirectory of the data/ directory.For instance, place training set of amazon under the original_data directory under the name.    
 The repository should like this after downloading and placing the data in the appropriate folders
 ``` Batchfile
 root
@@ -94,17 +94,17 @@ root
 ├── preprocess.py
 └── requirements.txt
 ```
-## 3.Preprocessing
+### 3.Preprocessing
 To preprocess and create ordered datasets, run 
 ``` Batchfile
 python preprocess.py
 ```
-## 4.Training Model from Scratch
+### 4.Training Model from Scratch
 To train your own model from scratch, run
 ``` Batchfile
 python main.py --mode train --epochs "any_number" --order "1/2/3/4"
 ```     
-## 5.Inference
+### 5.Inference
 To test the model, run 
 ``` Batchfile
 python main.py --mode test --model_path "path_to_checkpoint" --memory_path "path_to_replay_memory"
