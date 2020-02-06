@@ -38,8 +38,19 @@ At inference time, given a test example, a query vector of the test example is o
 *Note*: W<sub>i</sub> is only used to make a prediction for the i-th example, and the parameters are reset to W afterwards. In practice, only L local adaptation gradient steps are performed instead of finding the true minimum of the above equation.
 ## Documents
 
-### Dependencies
-	Run pip3 install -r requirements.txt to download all the dependencies
+## 1.Setup Instructions and Dependencies
+You may setup the repository on your local machine by either downloading it or running the following line on `terminal`.
+
+``` Batchfile
+git clone https://github.com/h3lio5/linguistic-style-transfer-pytorch.git
+```
+All dependencies required by this repo can be downloaded by creating a virtual environment with Python 3.7 and running
+
+``` Batchfile
+python3 -m venv .env
+source .env/bin/activate
+pip install -r requirements.txt
+```
 	
 ### Directory description
 Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
