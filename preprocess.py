@@ -77,6 +77,11 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
     and 7,600 sequences from each individual dataset for train and test data respectively
     i.e.,the size of the smallest training and test sets
     """
+
+    if not os.path.exists(save_location):
+        os.mkdir(save_location)
+        os.mkdir(os.path.join(save_location, 'test'))
+        os.mkdir(os.path.join(save_location, 'train'))
     dataset_sequence = TC_ORDER[order]
     ordered_dataset = {'labels': [], 'content': []}
     num_classes = -1
@@ -91,8 +96,8 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
 
         if data == 'yelp':
             yelp_done = True
-            df = pd.read_csv(base_location+'/'+split+'/'+data +
-                             '.csv', header=None, names=['labels', 'content'])
+            df = pd.read_csv(os.path.join(base_location, split, data +'.csv'), 
+                             header=None, names=['labels', 'content'])
             df.dropna(subset=['content'], inplace=True)
             df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
             if amazon_done:
@@ -116,7 +121,7 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
 
         elif data == 'amazon':
             amazon_done = True
-            df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',
+            df = pd.read_csv(os.path.join(base_location, split, data +'.csv'),
                              header=None, names=['labels', 'title', 'content'])
             df.dropna(subset=['content'], inplace=True)
             df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
@@ -140,9 +145,10 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
                 list(df.content[:max_samples]))
 
         elif data == 'yahoo':
-            df = pd.read_csv(base_location+'/'+split+'/'+data+'.csv',
+            df = pd.read_csv(os.path.join(base_location, split, data +'.csv'),
                              header=None, names=['labels', 'title', 'content', 'answer'])
             df.dropna(subset=['content'], inplace=True)
+            print(df['labels'].head())
             df.loc[:, 'labels'] = df.labels + num_classes
             df.loc[:, 'content'] = df.content.swifter.apply(preprocess)
             # filter rows with length greater than 20 (2 words including spaces on average)
@@ -189,11 +195,12 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
 
 if __name__ == "__main__":
 
+
     # create ordered dataset
     total_time = 0
     total_order = 4
     print("Started generating training data")
-    for i in range(0,1):
+    for i in range(0,4):
         print("Started for order {}".format(i+1))
         start = time.time()
         create_ordered_tc_data(i+1, split='train')
