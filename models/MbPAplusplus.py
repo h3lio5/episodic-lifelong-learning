@@ -4,8 +4,8 @@ import transformers
 import numpy as np
 from tqdm import trange
 import copy
+from models.baselines.MbPA import MbPA
 # import pdb
-
 
 class ReplayMemory(object):
     """
@@ -83,7 +83,7 @@ class MbPAplusplus(nn.Module):
     """
 
     def __init__(self, L=30, model_state=None):
-        super(MbPA, self).__init__()
+        super(MbPAplusplus, self).__init__()
 
         if model_state is None:
             # Key network to find key representation of content

@@ -4,6 +4,7 @@ import re
 import pickle
 import swifter
 import time
+import os
 
 TC_NUM_CLASSES = {
     'yelp': 5,
@@ -20,12 +21,13 @@ TC_ORDER = {
     4: ['agnews', 'yelp', 'amazon', 'yahoo', 'dbpedia']
 }
 # dataset order for question answering
-QA_ORDER = {
-    1: ['quac', 'trweb', 'trwik', 'squad'],
-    2: ['squad', 'trwik', 'quac', 'trweb'],
-    3: ['trweb', 'trwik', 'squad', 'quac'],
-    4: ['trwik', 'quac', 'trweb', 'squad']
-}
+# QA Not implemented
+# QA_ORDER = {
+#     1: ['quac', 'trweb', 'trwik', 'squad'],
+#     2: ['squad', 'trwik', 'quac', 'trweb'],
+#     3: ['trweb', 'trwik', 'squad', 'quac'],
+#     4: ['trwik', 'quac', 'trweb', 'squad']
+# }
 INDIVIDUAL_CLASS_LABELS = {
     'yelp': {1: '1', 2: '2', 3: '3', 4: '4', 5: '5'},
     'dbpedia': {1: 'Company', 2: 'EducationalInstitution', 3: 'Artist',
@@ -68,7 +70,8 @@ def preprocess(text):
     return str(text)
 
 
-def create_ordered_tc_data(order, base_location='data/original_data', save_location='data/ordered_data', split='train'):
+def create_ordered_tc_data(order, base_location='data/original_data', save_location=os.path.join
+('data','ordered_data'), split='train'):
     """
     creates ordered dataset for text classification with a maximum of 115,000 sequences
     and 7,600 sequences from each individual dataset for train and test data respectively
@@ -174,9 +177,13 @@ def create_ordered_tc_data(order, base_location='data/original_data', save_locat
     if split == 'test':
         ordered_dataframe.sample(frac=1).reset_index(drop=True, inplace=True)
 
-    ordered_dataframe.to_csv(save_location+'/'+split +
-                             '/'+str(order)+'.csv', index=False)
-    with open(save_location+'/'+split+'/'+str(order)+'.pkl', 'wb') as f:
+    save_path = os.path.join(save_location, split, str(order)+'.csv')
+    # ordered_dataframe.to_csv(save_location+'/'+split +
+    #                          '/'+str(order)+'.csv', index=False)
+    ordered_dataframe.to_csv(save_path, index=False)
+    pkl_path = os.path.join(save_location, split, str(order)+'.pkl')
+    # with open(save_location+'/'+split+'/'+str(order)+'.pkl', 'wb') as f:
+    with open(pkl_path, 'wb') as f:
         pickle.dump(label_to_class, f)
 
 
@@ -186,7 +193,7 @@ if __name__ == "__main__":
     total_time = 0
     total_order = 4
     print("Started generating training data")
-    for i in range(total_order):
+    for i in range(0,1):
         print("Started for order {}".format(i+1))
         start = time.time()
         create_ordered_tc_data(i+1, split='train')
@@ -197,7 +204,7 @@ if __name__ == "__main__":
     # create test data
     print("Started generating testing data")
     start = time.time()
-    create_ordered_tc_data(i+1, split='train')
+    create_ordered_tc_data(i+1, split='test')
     end = time.time()
     print("Total time taken: {} for generating testing data".format((end-start)/60))
     print("Completed preprocessing :)")
