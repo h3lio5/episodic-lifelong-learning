@@ -4,18 +4,21 @@ import requests
 import tarfile
 from glob import glob
 
-if not os.path.exists('data'):
-    os.mkdir('data')
-if not os.path.exists(os.path.join('data', 'original_data')):
-    os.mkdir(os.path.join('data', 'original_data'))
-    os.mkdir(os.path.join('data', 'original_data', 'train'))
-    os.mkdir(os.path.join('data', 'original_data', 'test'))
+# root_dir = os.path.join('','/storage','scratch2','ell_data')
+root_dir = os.path.join('data')
+
+if not os.path.exists(root_dir):
+    os.mkdir(root_dir)
+if not os.path.exists(os.path.join(root_dir, 'original_data')):
+    os.mkdir(os.path.join(root_dir, 'original_data'))
+    os.mkdir(os.path.join(root_dir, 'original_data', 'train'))
+    os.mkdir(os.path.join(root_dir, 'original_data', 'test'))
     
 
 files_links = {'agnews':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbUDNpeUdjb0wxRms/view?usp=sharing',
-               'amazon':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbUDNpeUdjb0wxRms/view?usp=sharing',
-               'dbpedia':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbUDNpeUdjb0wxRms/view?usp=sharing',
-               'yelp':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbUDNpeUdjb0wxRms/view?usp=sharing',
+               'amazon':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbZVhsUnRWRDhETzA/view?usp=sharing',
+               'dbpedia':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbQ2Vic1kxMmZZQ1k/view?usp=sharing',
+               'yelp':'https://drive.google.com/file/d/0Bz8a_Dbh9QhbZlU4dXhHTFhZQU0/view?usp=sharing',
                'yahoo':'https://drive.google.com/file/d/0Bz8a_Dbh9Qhbd2JNdDBsQUdocVU/view?usp=sharing'}
 
 # taken from this StackOverflow answer: https://stackoverflow.com/a/39225039
@@ -50,23 +53,23 @@ def save_response_content(response, destination):
 
 # download tarballs
 for name,url in files_links.items():
-    output = os.path.join('data', name+'.tar.gz')
+    output = os.path.join(root_dir, name+'.tar.gz')
     file_id = url.split('/')[5]
     download_file_from_google_drive(file_id, output)
 
 
 # extract to train and test
 for name in files_links.keys():
-    with tarfile.open(os.path.join('data',name+'.tar.gz')) as tf:
+    with tarfile.open(os.path.join(root_dir,name+'.tar.gz')) as tf:
         for m in tf.getmembers():
             if m.name[-4:] == '.csv':
                 folder =  m.name.split('.')[0].split('/')[-1]
                 m.name = name+'.csv'
                 print(f'Extracting {m.name} {folder}')
-                tf.extract(m, path=os.path.join('data', 'original_data', folder))
+                tf.extract(m, path=os.path.join(root_dir, 'original_data', folder))
 
 # delete tarballs
-tars = glob(os.path.join('data','*.gz'))
+tars = glob(os.path.join(root_dir,'*.gz'))
 [os.remove(t) for t in tars];
 
 
