@@ -4,3 +4,8 @@ test.py
 
 infer.py
 baselines/__pycache__
+data/
+models/__pycache__/
+models/baselines/__pycache__/
+__pycache__/
+__pycache__/data_loader.cpython-37.pyc

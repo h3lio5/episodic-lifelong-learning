@@ -4,8 +4,9 @@ import transformers
 import numpy as np
 from tqdm import trange
 import copy
+from models.baselines.MbPA import MbPA
+import random
 # import pdb
-
 
 class ReplayMemory(object):
     """
@@ -75,6 +76,14 @@ class ReplayMemory(object):
             samples.append(batch)
 
         return samples
+    
+    def sample(self, sample_size):
+        keys = random.sample(list(self.memory),sample_size)
+        contents = np.array([self.memory[k][0] for k in keys])
+        attn_masks = np.array([self.memory[k][1] for k in keys])
+        labels = np.array([self.memory[k][2] for k in keys])
+        return (torch.LongTensor(contents), torch.LongTensor(attn_masks), torch.LongTensor(labels))
+        
 
 
 class MbPAplusplus(nn.Module):
@@ -83,7 +92,7 @@ class MbPAplusplus(nn.Module):
     """
 
     def __init__(self, L=30, model_state=None):
-        super(MbPA, self).__init__()
+        super(MbPAplusplus, self).__init__()
 
         if model_state is None:
             # Key network to find key representation of content
