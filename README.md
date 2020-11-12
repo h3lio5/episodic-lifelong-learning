@@ -53,7 +53,7 @@ pip install -r requirements.txt
 ```
 	
 ### 2.Directory description
-Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M).    
+Download the data manually from [link](https://drive.google.com/drive/u/0/folders/0Bz8a_Dbh9Qhbfll6bVpmNUtUcFdjYmF2SEpmZUZUcVNiMUw1TWN6RDV3a0JHT3kxLVhVR2M) or use `python data_download.py` to download the data automatically.   
 The dataset files that you need to download and extract are as follows:
 * yelp_review_full_csv.tar.gz
 * yahoo_answers_csv.tar.gz
